@@ -37,10 +37,16 @@ function App() {
 }
 
 function HomePage() {
-  const { enabled, payload, isLoading } = useFlag<{ variant: string }>("new-homepage");
+  const { enabled, payload, isLoading } = useFlag<{ variant: string }>(
+    "new-homepage"
+  );
 
   if (isLoading) return <p>Loading…</p>;
-  return enabled ? <NewHomepage variant={payload?.variant} /> : <LegacyHomepage />;
+  return enabled ? (
+    <NewHomepage variant={payload?.variant} />
+  ) : (
+    <LegacyHomepage />
+  );
 }
 ```
 
@@ -70,13 +76,21 @@ import {
 } from "@basestack/flags-react";
 import { flagsConfig } from "./flags-config";
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const flags = await fetchFlags(flagsConfig);
 
   return (
     <html lang="en">
       <body>
-        <FlagsProvider config={flagsConfig} initialFlags={flags} preload={false}>
+        <FlagsProvider
+          config={flagsConfig}
+          initialFlags={flags}
+          preload={false}
+        >
           {children}
         </FlagsProvider>
         <FlagsHydrationScript flags={flags} />
@@ -105,7 +119,11 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   const initialFlags = pageProps.flags ?? [];
 
   return (
-    <FlagsProvider config={config} initialFlags={initialFlags} preload={!initialFlags.length}>
+    <FlagsProvider
+      config={config}
+      initialFlags={initialFlags}
+      preload={!initialFlags.length}
+    >
       <Component {...pageProps} />
     </FlagsProvider>
   );
@@ -175,7 +193,11 @@ export const Route = createFileRoute("/_app")({
 All server helpers live in the main export:
 
 ```ts
-import { fetchFlags, fetchFlag, createServerFlagsClient } from "@basestack/flags-react";
+import {
+  fetchFlags,
+  fetchFlag,
+  createServerFlagsClient,
+} from "@basestack/flags-react";
 ```
 
 - `fetchFlags(config, slugs?)`: returns a `Flag[]`. When `slugs` is omitted, it loads the full project.
@@ -185,7 +207,10 @@ import { fetchFlags, fetchFlag, createServerFlagsClient } from "@basestack/flags
 ## Hydration helpers
 
 ```tsx
-import { FlagsHydrationScript, readHydratedFlags } from "@basestack/flags-react";
+import {
+  FlagsHydrationScript,
+  readHydratedFlags,
+} from "@basestack/flags-react";
 
 // Server: embed the payload after the provider so client components can read it
 <FlagsHydrationScript flags={flags} globalKey="__BASESTACK_FLAGS__" />;
@@ -198,13 +223,13 @@ const hydrated = readHydratedFlags();
 
 ## Scripts
 
-| Command | Description |
-| --- | --- |
-| `bun run build` | Bundle ESM + type declarations with `tsdown` |
-| `bun run dev` | Watch-mode build for local development |
-| `bun run lint` | Run Biome lint rules |
-| `bun run format` | Format the entire repo with Biome |
-| `bun run test` | Execute the Vitest suite in JSDOM |
+| Command          | Description                                  |
+| ---------------- | -------------------------------------------- |
+| `bun run build`  | Bundle ESM + type declarations with `tsdown` |
+| `bun run dev`    | Watch-mode build for local development       |
+| `bun run lint`   | Run Biome lint rules                         |
+| `bun run format` | Format the entire repo with Biome            |
+| `bun run test`   | Execute the Vitest suite in JSDOM            |
 
 Use `bun run prepublishOnly` locally before releasing to ensure lint + tests stay green.
 
