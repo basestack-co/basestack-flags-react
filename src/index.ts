@@ -1,12 +1,12 @@
-export { FlagsProvider } from "./provider";
-export type { FlagsProviderProps } from "./provider";
-export { useFlag, useFlags, useFlagsClient } from "./hooks";
+export type { CacheConfig, Flag, SDKConfig } from "@basestack/flags-js";
+export { FlagsSDK } from "@basestack/flags-js";
 export type { UseFlagOptions, UseFlagResult } from "./hooks";
+export { useFlag, useFlags, useFlagsClient } from "./hooks";
 export {
+  DEFAULT_FLAGS_GLOBAL,
   FlagsHydrationScript,
   readHydratedFlags,
-  DEFAULT_FLAGS_GLOBAL,
 } from "./hydration";
+export type { FlagsProviderProps } from "./provider";
+export { FlagsProvider } from "./provider";
 export { createServerFlagsClient, fetchFlag, fetchFlags } from "./server";
-export type { Flag, CacheConfig, SDKConfig } from "@basestack/flags-js";
-export { FlagsSDK } from "@basestack/flags-js";

@@ -1,6 +1,6 @@
 {
   "name": "@basestack/flags-react",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "React bindings for the Basestack Feature Flags SDK",
   "repository": "https://github.com/basestack-co/basestack-flags-react",
   "private": false,
@@ -22,10 +22,10 @@
     "build": "tsdown --config tsdown.config.ts",
     "dev": "tsdown --config tsdown.config.ts --watch",
     "clean": "rm -rf dist",
-    "lint": "bunx biome lint .",
+    "lint": "bunx biome lint src README.md examples/README.md package.json tsconfig.json tsdown.config.ts vitest.config.ts",
     "update:deps": "bun update -i",
-    "format": "bunx biome format --write .",
-    "check": "bunx biome check --write .",
+    "format": "bunx biome format --write src README.md examples/README.md package.json tsconfig.json tsdown.config.ts vitest.config.ts",
+    "check": "bunx biome check --write src README.md examples/README.md package.json tsconfig.json tsdown.config.ts vitest.config.ts",
     "test": "bunx vitest run",
     "test:watch": "bunx vitest watch",
     "prepublishOnly": "bun run lint && bun run test && bun run build",
@@ -47,7 +47,7 @@
   },
   "peerDependencies": {
     "react": ">=19.2.0",
-    "react-dom": ">=18.2.0"
+    "react-dom": ">=19.2.0"
   },
   "peerDependenciesMeta": {
     "react-dom": {

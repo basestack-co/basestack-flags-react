@@ -38,7 +38,7 @@ function App() {
 
 function HomePage() {
   const { enabled, payload, isLoading } = useFlag<{ variant: string }>(
-    "new-homepage"
+    "header"
   );
 
   if (isLoading) return <p>Loading…</p>;
@@ -238,3 +238,14 @@ Use `bun run prepublishOnly` locally before releasing to ensure lint + tests sta
 - Source lives in `src/` and is compiled to `dist/` via `tsdown` (ESM only).
 - The package exposes only modern ESM/Node 20+ syntax; no CommonJS output is produced.
 - Biome powers linting/formatting, so please keep editor integrations enabled.
+
+## Examples
+
+Minimal framework demos live in `examples/`. Each project links `@basestack/flags-react` to `dist/` so you can test the SDK locally without publishing:
+
+- `examples/next-app-router`
+- `examples/next-pages-router`
+- `examples/tanstack-start`
+- `examples/react-vite`
+
+Follow the per-project instructions in `examples/README.md` to install dependencies with Bun and run the dev servers.

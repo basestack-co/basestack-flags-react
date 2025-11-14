@@ -1,1 +1,8 @@
 dist
+node_modules
+examples
+examples/**
+examples/*/node_modules
+examples/*/.next
+examples/*/.turbo
+examples/*/.vinxi

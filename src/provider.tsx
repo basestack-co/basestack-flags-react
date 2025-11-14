@@ -1,6 +1,15 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+"use client";
+
 import type { Flag, SDKConfig } from "@basestack/flags-js";
 import { FlagsSDK } from "@basestack/flags-js";
+import {
+  type ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FlagsContext } from "./context";
 
 export interface FlagsProviderProps {
@@ -32,14 +41,19 @@ export function FlagsProvider({
 }: FlagsProviderProps) {
   const providedFlags = initialFlags ?? EMPTY_FLAGS;
   const hasInitialFlags = providedFlags.length > 0;
-  const [flags, setFlags] = useState<Map<string, Flag>>(() => mapFromFlags(providedFlags));
+  const [flags, setFlags] = useState<Map<string, Flag>>(() =>
+    mapFromFlags(providedFlags),
+  );
   const [loading, setLoading] = useState<boolean>(preload && !hasInitialFlags);
   const [error, setError] = useState<Error | null>(null);
   const isMounted = useRef(true);
 
-  useEffect(() => () => {
-    isMounted.current = false;
-  }, []);
+  useEffect(
+    () => () => {
+      isMounted.current = false;
+    },
+    [],
+  );
 
   const client = useMemo(() => new FlagsSDK(config), [config]);
 
@@ -110,7 +124,9 @@ export function FlagsProvider({
 
   const fetchAllOrPreload = useCallback(async () => {
     if (config.preloadFlags && config.preloadFlags.length > 0) {
-      const fetched = await Promise.all(config.preloadFlags.map((slug) => client.getFlag(slug)));
+      const fetched = await Promise.all(
+        config.preloadFlags.map((slug) => client.getFlag(slug)),
+      );
       upsertFlags(fetched);
       return;
     }
@@ -161,7 +177,14 @@ export function FlagsProvider({
     return () => {
       cancelled = true;
     };
-  }, [fetchAllOrPreload, hasInitialFlags, normalizeError, preload, safeSetError, safeSetLoading]);
+  }, [
+    fetchAllOrPreload,
+    hasInitialFlags,
+    normalizeError,
+    preload,
+    safeSetError,
+    safeSetLoading,
+  ]);
 
   const value = useMemo(
     () => ({
@@ -175,5 +198,7 @@ export function FlagsProvider({
     [client, error, flags, loading, refresh, upsertFlag],
   );
 
-  return <FlagsContext.Provider value={value}>{children}</FlagsContext.Provider>;
+  return (
+    <FlagsContext.Provider value={value}>{children}</FlagsContext.Provider>
+  );
 }

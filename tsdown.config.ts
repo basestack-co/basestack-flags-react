@@ -8,5 +8,5 @@ export default defineConfig({
   splitting: false,
   platform: "neutral",
   target: "es2022",
-  external: ["react", "react-dom", "@basestack/flags-js"]
+  external: ["react", "react-dom", "@basestack/flags-js"],
 });

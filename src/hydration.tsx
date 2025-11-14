@@ -9,7 +9,8 @@ export interface FlagsHydrationScriptProps {
   readonly globalKey?: string;
 }
 
-const encodeFlagsForScript = (flags: Flag[]) => JSON.stringify(flags).replace(/</g, "\\u003C");
+const encodeFlagsForScript = (flags: Flag[]) =>
+  JSON.stringify(flags).replace(/</g, "\\u003C");
 
 export function FlagsHydrationScript({
   flags,
@@ -21,25 +22,19 @@ export function FlagsHydrationScript({
   const script = `globalThis[${JSON.stringify(globalKey)}] = ${payload};`;
 
   return (
-    <script
-      id={id}
-      nonce={nonce}
-      suppressHydrationWarning
-    >
+    <script id={id} nonce={nonce} suppressHydrationWarning>
       {script}
     </script>
   );
 }
 
-interface HydratedWindow extends Window {
-  [key: string]: unknown;
-}
-
-export const readHydratedFlags = (globalKey = DEFAULT_FLAGS_GLOBAL): Flag[] | undefined => {
+export const readHydratedFlags = (
+  globalKey = DEFAULT_FLAGS_GLOBAL,
+): Flag[] | undefined => {
   if (typeof window === "undefined") {
     return undefined;
   }
 
-  const flags = (window as HydratedWindow)[globalKey];
+  const flags = (window as unknown as Record<string, unknown>)[globalKey];
   return Array.isArray(flags) ? (flags as Flag[]) : undefined;
 };

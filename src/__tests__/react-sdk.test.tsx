@@ -1,12 +1,12 @@
-import { renderHook, act } from "@testing-library/react";
-import { renderToStaticMarkup } from "react-dom/server";
 import type { Flag, SDKConfig } from "@basestack/flags-js";
-import { describe, expect, it, beforeEach, vi } from "vitest";
+import { act, renderHook } from "@testing-library/react";
 import type { ReactNode } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  DEFAULT_FLAGS_GLOBAL,
   FlagsHydrationScript,
   FlagsProvider,
-  DEFAULT_FLAGS_GLOBAL,
   readHydratedFlags,
   useFlag,
   useFlags,
@@ -71,15 +71,24 @@ const config: SDKConfig = {
   environmentKey: "test-env",
 };
 
-const createWrapper = (value: Partial<Parameters<typeof FlagsProvider>[0]> = {}) => {
-  const props = { config, preload: false, ...value } satisfies Partial<Parameters<typeof FlagsProvider>[0]>;
+const createWrapper = (
+  value: Partial<Parameters<typeof FlagsProvider>[0]> = {},
+) => {
+  const props = { config, preload: false, ...value } satisfies Partial<
+    Parameters<typeof FlagsProvider>[0]
+  >;
 
-  return ({ children }: { children: ReactNode }) => <FlagsProvider {...props}>{children}</FlagsProvider>;
+  return ({ children }: { children: ReactNode }) => (
+    <FlagsProvider {...props}>{children}</FlagsProvider>
+  );
 };
 
 describe("FlagsProvider + hooks", () => {
   beforeEach(() => {
-    setMockFlags([createFlag(), createFlag({ slug: "secondary", enabled: false })]);
+    setMockFlags([
+      createFlag(),
+      createFlag({ slug: "secondary", enabled: false }),
+    ]);
   });
 
   it("exposes initial flags immediately", () => {
@@ -127,10 +136,13 @@ describe("hydration helpers", () => {
 
   it("reads hydrated flags from the window object", () => {
     const flags = [createFlag({ slug: "hydrated" })];
-    (window as typeof window & Record<string, Flag[]>)[DEFAULT_FLAGS_GLOBAL] = flags;
+    (window as typeof window & Record<string, Flag[]>)[DEFAULT_FLAGS_GLOBAL] =
+      flags;
 
     expect(readHydratedFlags()).toEqual(flags);
 
-    delete (window as typeof window & Record<string, Flag[]>)[DEFAULT_FLAGS_GLOBAL];
+    delete (window as typeof window & Record<string, Flag[]>)[
+      DEFAULT_FLAGS_GLOBAL
+    ];
   });
 });

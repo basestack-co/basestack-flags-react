@@ -1,5 +1,7 @@
-import { createContext, useContext } from "react";
+"use client";
+
 import type { Flag, FlagsSDK } from "@basestack/flags-js";
+import { createContext, useContext } from "react";
 
 interface FlagsContextValue {
   client: FlagsSDK;
