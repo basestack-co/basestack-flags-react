@@ -1,19 +1,28 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022", "DOM"],
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "strict": true,
     "esModuleInterop": true,
     "noEmit": true,
-    "paths": {
-      "@basestack/flags-react": ["../../dist/index"],
-      "@basestack/flags-react/client": ["../../dist/client"],
-      "@basestack/flags-react/server": ["../../dist/server"]
-    }
+    "allowJs": true,
+    "skipLibCheck": true,
+    "incremental": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true
   },
-  "include": ["next-env.d.ts", "pages", "flags-config.ts"],
-  "exclude": ["node_modules"]
+  "include": [
+    "next-env.d.ts",
+    "pages",
+    "flags-config.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

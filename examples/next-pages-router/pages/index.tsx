@@ -1,14 +1,12 @@
 import type { Flag } from "@basestack/flags-js";
-import { useFlag } from "@basestack/flags-react/client";
-import { fetchFlags } from "@basestack/flags-react/server";
+import { useFlag } from "../../../dist/client";
+import { fetchFlags } from "../../../dist/server";
 import type { GetServerSideProps } from "next";
 import { flagsConfig } from "../flags-config";
 
 export default function Home({ flags }: { flags: Flag[] }) {
   // Client components can still call useFlag thanks to the provider in _app
-  const { enabled, payload, isLoading } = useFlag<{ variant?: string }>(
-    "header",
-  );
+  const { enabled, payload, isLoading } = useFlag<{ color?: string }>("header");
 
   return (
     <main style={{ fontFamily: "sans-serif", padding: "2rem" }}>
@@ -18,7 +16,9 @@ export default function Home({ flags }: { flags: Flag[] }) {
         Flag <code>header</code> is{" "}
         {isLoading ? "loading" : enabled ? "enabled" : "disabled"}
       </p>
-      {enabled && payload?.variant ? <p>Variant: {payload.variant}</p> : null}
+      {enabled && payload ? (
+        <p>Payload: {JSON.stringify(payload, null, 2)}</p>
+      ) : null}
     </main>
   );
 }

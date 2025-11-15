@@ -4,7 +4,7 @@ import { useFlag } from "../../../dist/client";
 
 export default function HomePage() {
   const { enabled, payload, isLoading } = useFlag<{ variant?: string }>(
-    "header",
+    "header"
   );
 
   if (isLoading)
@@ -16,7 +16,9 @@ export default function HomePage() {
       <p>
         Flag <code>header</code> is {enabled ? "enabled" : "disabled"}
       </p>
-      {enabled && payload?.variant ? <p>Variant: {payload.variant}</p> : null}
+      {enabled && payload ? (
+        <p>Variant: {JSON.stringify(payload, null, 2)}</p>
+      ) : null}
     </main>
   );
 }

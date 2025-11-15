@@ -5,12 +5,7 @@
     "moduleResolution": "Bundler",
     "allowSyntheticDefaultImports": true,
     "strict": true,
-    "baseUrl": ".",
-    "paths": {
-      "@basestack/flags-react": ["../../dist/index"],
-      "@basestack/flags-react/client": ["../../dist/client"],
-      "@basestack/flags-react/server": ["../../dist/server"]
-    }
+    "baseUrl": "."
   },
   "include": ["vite.config.ts"]
 }

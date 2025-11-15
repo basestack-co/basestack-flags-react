@@ -1,5 +1,5 @@
 import type { Flag } from "@basestack/flags-js";
-import { FlagsProvider } from "@basestack/flags-react/client";
+import { FlagsProvider } from "../../../dist/client";
 import type { AppProps } from "next/app";
 import { flagsConfig } from "../flags-config";
 

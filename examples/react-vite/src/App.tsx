@@ -1,8 +1,8 @@
-import { useFlag } from "@basestack/flags-react/client";
+import { useFlag } from "../../../dist/client";
 
 export function App() {
   const { enabled, payload, isLoading, refresh } = useFlag<{
-    variant?: string;
+    color?: string;
   }>("header");
 
   return (
@@ -12,7 +12,9 @@ export function App() {
         Flag <code>header</code> is{" "}
         {isLoading ? "checking" : enabled ? "enabled" : "disabled"}
       </p>
-      {enabled && payload?.variant ? <p>Variant: {payload.variant}</p> : null}
+      {enabled && payload ? (
+        <p>Payload: {JSON.stringify(payload, null, 2)}</p>
+      ) : null}
       <button type="button" onClick={() => refresh()}>
         Refresh flag
       </button>
