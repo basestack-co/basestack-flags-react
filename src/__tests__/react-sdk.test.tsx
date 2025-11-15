@@ -5,12 +5,12 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   DEFAULT_FLAGS_GLOBAL,
-  FlagsHydrationScript,
   FlagsProvider,
   readHydratedFlags,
   useFlag,
   useFlags,
-} from "../index";
+} from "../client";
+import { FlagsHydrationScript } from "../server";
 
 const flagsStore: Record<string, Flag> = {};
 

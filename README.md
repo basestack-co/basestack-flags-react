@@ -21,7 +21,7 @@ React 18+ is required and should already exist in your project. The package ship
 ## Quick start (React + Vite)
 
 ```tsx
-import { FlagsProvider, useFlag } from "@basestack/flags-react";
+import { FlagsProvider, useFlag } from "@basestack/flags-react/client";
 
 const config = {
   projectKey: process.env.VITE_BASESTACK_PROJECT_KEY!,
@@ -57,6 +57,14 @@ function HomePage() {
 - Hooks keep a shared cache, so subsequent components reuse already fetched flags.
 - Call `refresh()` from either `useFlag` or `useFlags` to re-query the API.
 
+## Import paths
+
+Use the subpath that matches your runtime to avoid loading client-only hooks on the server:
+
+- `@basestack/flags-react/client` &mdash; `FlagsProvider`, hooks, `readHydratedFlags`, and SDK types. The file itself includes the `"use client"` directive.
+- `@basestack/flags-react/server` &mdash; `fetchFlag`, `fetchFlags`, `createServerFlagsClient`, `FlagsHydrationScript`, and shared constants.
+- `@basestack/flags-react` &mdash; server-friendly exports (no hooks or provider). Prefer the explicit `/client` and `/server` paths for new integrations.
+
 ## Next.js (App Router)
 
 ```tsx
@@ -69,11 +77,8 @@ export const flagsConfig = {
 
 ```tsx
 // app/layout.tsx
-import {
-  FlagsProvider,
-  FlagsHydrationScript,
-  fetchFlags,
-} from "@basestack/flags-react";
+import { FlagsHydrationScript, fetchFlags } from "@basestack/flags-react/server";
+import { Providers } from "./providers";
 import { flagsConfig } from "./flags-config";
 
 export default async function RootLayout({
@@ -86,16 +91,38 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body>
-        <FlagsProvider
-          config={flagsConfig}
-          initialFlags={flags}
-          preload={false}
-        >
-          {children}
-        </FlagsProvider>
+        <Providers initialFlags={flags}>{children}</Providers>
         <FlagsHydrationScript flags={flags} />
       </body>
     </html>
+  );
+}
+```
+
+```tsx
+// app/providers.tsx
+"use client";
+
+import { FlagsProvider } from "@basestack/flags-react/client";
+import type { Flag } from "@basestack/flags-js";
+import type { ReactNode } from "react";
+import { flagsConfig } from "./flags-config";
+
+export function Providers({
+  children,
+  initialFlags,
+}: {
+  children: ReactNode;
+  initialFlags?: Flag[];
+}) {
+  return (
+    <FlagsProvider
+      config={flagsConfig}
+      initialFlags={initialFlags}
+      preload={!initialFlags?.length}
+    >
+      {children}
+    </FlagsProvider>
   );
 }
 ```
@@ -107,23 +134,18 @@ Use `fetchFlag()` inside Server Components or Route Handlers if you only need a 
 ```tsx
 // pages/_app.tsx
 import type { AppProps } from "next/app";
-import { FlagsProvider } from "@basestack/flags-react";
-import { useMemo } from "react";
+import { FlagsProvider } from "@basestack/flags-react/client";
 
 const config = {
   projectKey: process.env.NEXT_PUBLIC_BASESTACK_PROJECT_KEY!,
   environmentKey: process.env.NEXT_PUBLIC_BASESTACK_ENVIRONMENT_KEY!,
 };
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+export default function MyApp({ Component, pageProps }: AppProps<{ flags?: Flag[] }>) {
   const initialFlags = pageProps.flags ?? [];
 
   return (
-    <FlagsProvider
-      config={config}
-      initialFlags={initialFlags}
-      preload={!initialFlags.length}
-    >
+    <FlagsProvider config={config} initialFlags={initialFlags} preload={!initialFlags.length}>
       <Component {...pageProps} />
     </FlagsProvider>
   );
@@ -132,10 +154,12 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
 ```tsx
 // pages/index.tsx
+import { fetchFlags } from "@basestack/flags-react/server";
+import { useFlag } from "@basestack/flags-react/client";
 import type { GetServerSideProps } from "next";
-import { fetchFlags } from "@basestack/flags-react";
+import type { Flag } from "@basestack/flags-js";
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps<{ flags: Flag[] }> = async () => {
   const flags = await fetchFlags({
     projectKey: process.env.BASESTACK_PROJECT_KEY!,
     environmentKey: process.env.BASESTACK_ENVIRONMENT_KEY!,
@@ -160,7 +184,8 @@ export const flagsConfig = {
 ```tsx
 // routes/_app.tsx
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { FlagsProvider, fetchFlags } from "@basestack/flags-react";
+import { FlagsProvider } from "@basestack/flags-react/client";
+import { fetchFlags } from "@basestack/flags-react/server";
 import { flagsConfig } from "../config/flags";
 
 export const Route = createFileRoute("/_app")({
@@ -178,6 +203,8 @@ export const Route = createFileRoute("/_app")({
 
 ## Hooks reference
 
+Import these from `@basestack/flags-react/client`.
+
 - `useFlag(slug, options)`
   - Returns `{ flag, enabled, payload, isLoading, error, refresh }`.
   - Automatically fetches the flag once per mount (unless `options.fetch === false`).
@@ -190,14 +217,14 @@ export const Route = createFileRoute("/_app")({
 
 ## Server utilities
 
-All server helpers live in the main export:
+All server helpers live in the `/server` subpath:
 
 ```ts
 import {
   fetchFlags,
   fetchFlag,
   createServerFlagsClient,
-} from "@basestack/flags-react";
+} from "@basestack/flags-react/server";
 ```
 
 - `fetchFlags(config, slugs?)`: returns a `Flag[]`. When `slugs` is omitted, it loads the full project.
@@ -207,10 +234,8 @@ import {
 ## Hydration helpers
 
 ```tsx
-import {
-  FlagsHydrationScript,
-  readHydratedFlags,
-} from "@basestack/flags-react";
+import { FlagsHydrationScript } from "@basestack/flags-react/server";
+import { readHydratedFlags } from "@basestack/flags-react/client";
 
 // Server: embed the payload after the provider so client components can read it
 <FlagsHydrationScript flags={flags} globalKey="__BASESTACK_FLAGS__" />;
@@ -219,7 +244,7 @@ import {
 const hydrated = readHydratedFlags();
 ```
 
-`FlagsHydrationScript` encodes the snapshot using `globalThis["__BASESTACK_FLAGS__"]`. Pass `globalKey` to customize the name or set a CSP `nonce` when needed.
+`FlagsHydrationScript` encodes the snapshot using `globalThis["__BASESTACK_FLAGS__"]`. Pass `globalKey` to customize the name or set a CSP `nonce` when needed. `readHydratedFlags` only works in the browser, so import it from `/client`.
 
 ## Scripts
 

@@ -7,6 +7,11 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
+    "paths": {
+      "@basestack/flags-react": ["../../dist/index"],
+      "@basestack/flags-react/client": ["../../dist/client"],
+      "@basestack/flags-react/server": ["../../dist/server"]
+    }
   },
   "include": ["routes", "app"],
   "exclude": ["node_modules"]

@@ -1,4 +1,4 @@
-import { FlagsProvider } from "@basestack/flags-react";
+import { FlagsProvider } from "@basestack/flags-react/client";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";

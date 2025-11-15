@@ -1,4 +1,4 @@
-import { useFlag } from "@basestack/flags-react";
+import { useFlag } from "@basestack/flags-react/client";
 
 export function App() {
   const { enabled, payload, isLoading, refresh } = useFlag<{

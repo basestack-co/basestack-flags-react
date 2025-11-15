@@ -8,6 +8,11 @@
     "strict": true,
     "esModuleInterop": true,
     "noEmit": true,
+    "paths": {
+      "@basestack/flags-react": ["../../dist/index"],
+      "@basestack/flags-react/client": ["../../dist/client"],
+      "@basestack/flags-react/server": ["../../dist/server"]
+    }
   },
   "include": ["next-env.d.ts", "pages", "flags-config.ts"],
   "exclude": ["node_modules"]

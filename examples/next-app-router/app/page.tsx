@@ -1,6 +1,6 @@
 "use client";
 
-import { useFlag } from "@basestack/flags-react";
+import { useFlag } from "../../../dist/client";
 
 export default function HomePage() {
   const { enabled, payload, isLoading } = useFlag<{ variant?: string }>(

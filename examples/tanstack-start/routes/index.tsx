@@ -1,4 +1,4 @@
-import { useFlag } from "@basestack/flags-react";
+import { useFlag } from "@basestack/flags-react/client";
 import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/")({

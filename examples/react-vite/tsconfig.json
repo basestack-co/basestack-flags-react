@@ -8,7 +8,12 @@
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "@basestack/flags-react": ["../../dist/index"],
+      "@basestack/flags-react/client": ["../../dist/client"],
+      "@basestack/flags-react/server": ["../../dist/server"]
+    }
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]

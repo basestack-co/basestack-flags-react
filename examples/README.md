@@ -22,6 +22,6 @@ This folder contains minimal projects that mirror the integration patterns in th
 Each project ships with:
 - A framework-specific provider wrapper showing where to fetch flags (`fetchFlags`) on the server.
 - A simple component that calls `useFlag("header")` to conditionally render UI.
-- Tooling configs (`next.config.mjs`, `vite.config.ts`, or `tanstack.config.ts`) that alias `@basestack/flags-react` to `../../dist/index.js`.
+- Tooling configs (`next.config.mjs`, `vite.config.ts`, or `tanstack.config.ts`) that alias `@basestack/flags-react` plus the `/client` and `/server` subpaths to the matching files inside `../../dist`.
 
 When you are ready to test against a production build from npm, remove the alias and add `@basestack/flags-react` as a normal dependency instead.

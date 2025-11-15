@@ -1,11 +1,10 @@
+import type { ReactNode } from "react";
 import {
   FlagsHydrationScript,
-  FlagsProvider,
   fetchFlags,
-  readHydratedFlags,
-} from "@basestack/flags-react";
-import type { ReactNode } from "react";
+} from "../../../dist/server";
 import { flagsConfig } from "./flags-config";
+import { Providers } from "./Providers";
 
 export const metadata = {
   title: "Basestack Flags • Next.js App Router",
@@ -16,21 +15,13 @@ export default async function RootLayout({
 }: {
   children: ReactNode;
 }) {
-  // Reuse hydrated flags during fast refresh to avoid double-fetching locally
-  const hydrated = readHydratedFlags();
-  const flags = hydrated ?? (await fetchFlags(flagsConfig));
+  const flags = await fetchFlags(flagsConfig);
 
   return (
     <html lang="en">
       <body>
-        <FlagsProvider
-          config={flagsConfig}
-          initialFlags={flags}
-          preload={!flags?.length}
-        >
-          {children}
-        </FlagsProvider>
-        {flags ? <FlagsHydrationScript flags={flags} /> : null}
+        <Providers initialFlags={flags}>{children}</Providers>
+        <FlagsHydrationScript flags={flags} />
       </body>
     </html>
   );

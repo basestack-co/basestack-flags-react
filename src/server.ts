@@ -29,3 +29,10 @@ export const fetchFlags = async (
   const { flags } = await client.getAllFlags();
   return flags;
 };
+
+export {
+  FlagsHydrationScript,
+  DEFAULT_FLAGS_GLOBAL,
+} from "./hydration";
+export type { CacheConfig, Flag, SDKConfig } from "@basestack/flags-js";
+export { FlagsSDK } from "@basestack/flags-js";

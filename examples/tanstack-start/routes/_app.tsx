@@ -1,5 +1,6 @@
 import type { Flag } from "@basestack/flags-js";
-import { FlagsProvider, fetchFlags } from "@basestack/flags-react";
+import { FlagsProvider } from "@basestack/flags-react/client";
+import { fetchFlags } from "@basestack/flags-react/server";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import { flagsConfig } from "../app/config/flags";
 

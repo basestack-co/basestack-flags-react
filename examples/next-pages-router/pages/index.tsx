@@ -1,5 +1,6 @@
 import type { Flag } from "@basestack/flags-js";
-import { fetchFlags, useFlag } from "@basestack/flags-react";
+import { useFlag } from "@basestack/flags-react/client";
+import { fetchFlags } from "@basestack/flags-react/server";
 import type { GetServerSideProps } from "next";
 import { flagsConfig } from "../flags-config";
 
