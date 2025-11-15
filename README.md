@@ -129,6 +129,13 @@ export function Providers({
 
 Use `fetchFlag()` inside Server Components or Route Handlers if you only need a single slug.
 
+### Route Handler + Server Functions demo
+
+The App Router example also includes:
+
+- `GET /api/flags` (`app/api/flags/route.ts`) to prove the SDK works inside a Route Handler / API route.
+- A `/server-functions` page that lists current flag states on the server and ships a `ServerActionDemo` client component which invokes a server action powered by `fetchFlag`.
+
 ## Next.js (Pages Router)
 
 ```tsx
@@ -169,6 +176,26 @@ export const getServerSideProps: GetServerSideProps<{ flags: Flag[] }> = async (
     props: { flags },
   };
 };
+
+### API Route
+
+Add a legacy API route that relies on the same server helper:
+
+```ts
+// pages/api/flags.ts
+import type { NextApiRequest, NextApiResponse } from "next";
+import { fetchFlags } from "@basestack/flags-react/server";
+import { flagsConfig } from "../../flags-config";
+
+export default async function handler(_req: NextApiRequest, res: NextApiResponse) {
+  try {
+    const flags = await fetchFlags(flagsConfig);
+    res.status(200).json({ flags });
+  } catch (error) {
+    res.status(500).json({ message: "Unable to load flags" });
+  }
+}
+```
 ```
 
 ## TanStack Start

@@ -5,7 +5,7 @@
     "": {
       "name": "example-next-pages-router",
       "dependencies": {
-        "@basestack/flags-js": "^1.0.6",
+        "@basestack/flags-js": "^1.0.7",
         "next": "16.0.3",
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
@@ -17,7 +17,7 @@
     },
   },
   "packages": {
-    "@basestack/flags-js": ["@basestack/flags-js@1.0.6", "", {}, "sha512-++EY0nUU30hcgNOshqv3KfRnWArEeLAjU6JLvVum+HYBvMWihTWJnbOtYeuXLMcVPg/COZBSeEt9d7QSV0UVZQ=="],
+    "@basestack/flags-js": ["@basestack/flags-js@1.0.7", "", {}, "sha512-qvAOE/+pTYnNTXMGNQ25BNjA3hx4nwJMGIyYmCueOTfvUclbOpeVjpO+Zl9Rx/NBajlNZQdcyGAXnFbTPukZeQ=="],
 
     "@emnapi/runtime": ["@emnapi/runtime@1.7.1", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-PVtJr5CmLwYAU9PZDMITZoR5iAOShYREoR45EyyLrbntV50mdePTgUn4AmOw90Ifcj+x2kRjdzr1HP3RrNiHGA=="],
 

@@ -23,5 +23,8 @@ Each project ships with:
 - A framework-specific provider wrapper showing where to fetch flags (`fetchFlags`) on the server.
 - A simple component that calls `useFlag("header")` to conditionally render UI.
 - Tooling configs (`next.config.mjs`, `vite.config.ts`, or `tanstack.config.ts`) that alias `@basestack/flags-react` plus the `/client` and `/server` subpaths to the matching files inside `../../dist`.
+- Server-facing demos:
+  - `next-app-router` exposes `GET /api/flags` (Route Handler) and a `/server-functions` page that exercises a Server Action powered by the SDK.
+  - `next-pages-router` exposes `GET /api/flags` (API Route) so you can verify the server helper works under the legacy router as well.
 
 When you are ready to test against a production build from npm, remove the alias and add `@basestack/flags-react` as a normal dependency instead.

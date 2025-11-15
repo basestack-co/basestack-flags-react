@@ -54,8 +54,8 @@
     "@basestack/flags-js": "^1.0.5"
   },
   "peerDependencies": {
-    "react": ">=19.2.0",
-    "react-dom": ">=19.2.0"
+    "react": ">=18.2.0",
+    "react-dom": ">=18.2.0"
   },
   "peerDependenciesMeta": {
     "react-dom": {
@@ -73,5 +73,17 @@
     "vitest": "^4.0.9",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=18.17.0"
+  },
+  "browserslist": [
+    "defaults",
+    ">0.35%",
+    "not IE 11",
+    "maintained node versions"
+  ]
 }
