@@ -16,7 +16,28 @@ React bindings for the [Basestack Flags JS SDK](https://github.com/basestack-co/
 bun install @basestack/flags-react @basestack/flags-js
 ```
 
+```bash
+npm install @basestack/flags-react @basestack/flags-js
+```
+
+```bash
+yarn add @basestack/flags-react @basestack/flags-js
+```
+
 React 18+ is required and should already exist in your project. The package ships as pure ESM and targets modern browsers/runtime APIs.
+
+## Local development
+
+The repository uses Bun as the package manager and script runner:
+
+```bash
+bun install           # install dependencies
+bun run lint          # biome lint (restricted to src + config files)
+bun run test          # vitest suite
+bun run build         # compile to dist/ via tsdown
+```
+
+All examples rely on the compiled `dist/` output, so run `bun run build` before opening any of them.
 
 ## Quick start (React + Vite)
 
@@ -70,6 +91,7 @@ Use the subpath that matches your runtime to avoid loading client-only hooks on 
 ```tsx
 // app/flags-config.ts
 export const flagsConfig = {
+  baseURL: process.env.BASESTACK_BASE_URL!,
   projectKey: process.env.BASESTACK_PROJECT_KEY!,
   environmentKey: process.env.BASESTACK_ENVIRONMENT_KEY!,
 };
@@ -77,7 +99,10 @@ export const flagsConfig = {
 
 ```tsx
 // app/layout.tsx
-import { FlagsHydrationScript, fetchFlags } from "@basestack/flags-react/server";
+import {
+  FlagsHydrationScript,
+  fetchFlags,
+} from "@basestack/flags-react/server";
 import { Providers } from "./providers";
 import { flagsConfig } from "./flags-config";
 
@@ -148,18 +173,25 @@ const config = {
   environmentKey: process.env.NEXT_PUBLIC_BASESTACK_ENVIRONMENT_KEY!,
 };
 
-export default function MyApp({ Component, pageProps }: AppProps<{ flags?: Flag[] }>) {
+export default function MyApp({
+  Component,
+  pageProps,
+}: AppProps<{ flags?: Flag[] }>) {
   const initialFlags = pageProps.flags ?? [];
 
   return (
-    <FlagsProvider config={config} initialFlags={initialFlags} preload={!initialFlags.length}>
+    <FlagsProvider
+      config={config}
+      initialFlags={initialFlags}
+      preload={!initialFlags.length}
+    >
       <Component {...pageProps} />
     </FlagsProvider>
   );
 }
 ```
 
-```tsx
+````tsx
 // pages/index.tsx
 import { fetchFlags } from "@basestack/flags-react/server";
 import { useFlag } from "@basestack/flags-react/client";
@@ -168,6 +200,7 @@ import type { Flag } from "@basestack/flags-js";
 
 export const getServerSideProps: GetServerSideProps<{ flags: Flag[] }> = async () => {
   const flags = await fetchFlags({
+    baseURL: process.env.BASESTACK_BASE_URL!,
     projectKey: process.env.BASESTACK_PROJECT_KEY!,
     environmentKey: process.env.BASESTACK_ENVIRONMENT_KEY!,
   });
@@ -195,8 +228,9 @@ export default async function handler(_req: NextApiRequest, res: NextApiResponse
     res.status(500).json({ message: "Unable to load flags" });
   }
 }
-```
-```
+````
+
+````
 
 ## TanStack Start
 
@@ -206,7 +240,7 @@ export const flagsConfig = {
   projectKey: process.env.BASESTACK_PROJECT_KEY!,
   environmentKey: process.env.BASESTACK_ENVIRONMENT_KEY!,
 };
-```
+````
 
 ```tsx
 // routes/_app.tsx
@@ -226,6 +260,64 @@ export const Route = createFileRoute("/_app")({
     );
   },
 });
+```
+
+## React + Vite (with server prefetch)
+
+When running a Vite app locally you can hydrate the provider with data fetched from your backend (or from the included Node dev server):
+
+```tsx
+// src/main.tsx
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { FlagsProvider } from "@basestack/flags-react/client";
+import { fetchFlags } from "@basestack/flags-react/server";
+import { App } from "./App";
+import { flagsConfig } from "./flagsConfig";
+
+async function bootstrap() {
+  const container = document.getElementById("root");
+  if (!container) throw new Error("Missing #root");
+
+  let initialFlags = [];
+  try {
+    initialFlags = await fetchFlags(flagsConfig);
+  } catch (error) {
+    console.warn("Failed to preload flags", error);
+  }
+
+  createRoot(container).render(
+    <StrictMode>
+      <FlagsProvider
+        config={flagsConfig}
+        initialFlags={initialFlags}
+        preload={initialFlags.length === 0}
+      >
+        <App />
+      </FlagsProvider>
+    </StrictMode>
+  );
+}
+
+bootstrap();
+```
+
+```tsx
+// src/App.tsx
+import { useFlag } from "@basestack/flags-react/client";
+
+export function App() {
+  const { enabled, payload, isLoading } = useFlag<{ variant?: string }>(
+    "header"
+  );
+
+  if (isLoading) return <p>Checking...</p>;
+  return enabled ? (
+    <NewHomepage variant={payload?.variant} />
+  ) : (
+    <LegacyHomepage />
+  );
+}
 ```
 
 ## Hooks reference
@@ -293,11 +385,19 @@ Use `bun run prepublishOnly` locally before releasing to ensure lint + tests sta
 
 ## Examples
 
-Minimal framework demos live in `examples/`. Each project links `@basestack/flags-react` to `dist/` so you can test the SDK locally without publishing:
+Minimal framework demos live in `examples/`. Each project links `@basestack/flags-react` and the `/client` + `/server` subpaths to `dist/`, so you can test the SDK locally without publishing.
 
-- `examples/next-app-router`
-- `examples/next-pages-router`
-- `examples/tanstack-start`
-- `examples/react-vite`
+| Example                 | Highlights                                                                                           | Path                         | Dev command   |
+| ----------------------- | ---------------------------------------------------------------------------------------------------- | ---------------------------- | ------------- |
+| Next.js 16 App Router   | Provider wrapper, Route Handler (`GET /api/flags`), `/server-functions` page with Server Action demo | `examples/next-app-router`   | `bun run dev` |
+| Next.js 16 Pages Router | `_app` wiring, `getServerSideProps`, `pages/api/flags.ts` API route                                  | `examples/next-pages-router` | `bun run dev` |
+| React + Vite            | Client-only bootstrap that preloads flags before render                                              | `examples/react-vite`        | `bun run dev` |
 
-Follow the per-project instructions in `examples/README.md` to install dependencies with Bun and run the dev servers.
+To run an example:
+
+1. `bun run build` at the repo root (ensures `dist/` exists).
+2. `cd examples/<example>` and `bun install`.
+3. Provide `BASESTACK_*` environment variables (or use the demo IDs committed in each config).
+4. `bun run dev` to start the framework’s dev server.
+
+See `examples/README.md` for more context.
