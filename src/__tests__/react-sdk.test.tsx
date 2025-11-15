@@ -9,10 +9,13 @@ import {
   readHydratedFlags,
   useFlag,
   useFlags,
+  useFlagsClient,
 } from "../client";
+import { useFlagsContext } from "../context";
 import { FlagsHydrationScript } from "../server";
 
 const flagsStore: Record<string, Flag> = {};
+let failGetAllFlags = false;
 
 const setMockFlags = (flags: Flag[]) => {
   Object.keys(flagsStore).forEach((slug) => {
@@ -43,6 +46,9 @@ vi.mock("@basestack/flags-js", async (importOriginal) => {
     }
 
     async getAllFlags(): Promise<{ flags: Flag[] }> {
+      if (failGetAllFlags) {
+        throw new Error("Forced failure");
+      }
       return {
         flags: Object.values(flagsStore),
       };
@@ -89,6 +95,7 @@ describe("FlagsProvider + hooks", () => {
       createFlag(),
       createFlag({ slug: "secondary", enabled: false }),
     ]);
+    failGetAllFlags = false;
   });
 
   it("exposes initial flags immediately", () => {
@@ -121,6 +128,43 @@ describe("FlagsProvider + hooks", () => {
     expect(result.current.collection.flagsBySlug.secondary.enabled).toBe(false);
     expect(result.current.collection.flags).toHaveLength(2);
   });
+
+  it("returns default values when fetch is disabled", () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(
+      () =>
+        useFlag("missing", {
+          fetch: false,
+          defaultEnabled: true,
+          defaultPayload: { variant: "fallback" },
+        }),
+      { wrapper },
+    );
+
+    expect(result.current.enabled).toBe(true);
+    expect(result.current.payload).toEqual({ variant: "fallback" });
+    expect(result.current.isLoading).toBe(true);
+  });
+
+  it("exposes the underlying client via useFlagsClient", () => {
+    const wrapper = createWrapper();
+    const { result } = renderHook(() => useFlagsClient(), { wrapper });
+
+    expect(typeof result.current.getFlag).toBe("function");
+    expect(typeof result.current.getAllFlags).toBe("function");
+  });
+
+  it("calls onError when refresh fails", async () => {
+    failGetAllFlags = true;
+    const onError = vi.fn();
+    const wrapper = createWrapper({ onError });
+    const { result } = renderHook(() => useFlags(), { wrapper });
+
+    await act(async () => {
+      await expect(result.current.refresh()).rejects.toThrow("Forced failure");
+    });
+    expect(onError).toHaveBeenCalledWith(expect.any(Error));
+  });
 });
 
 describe("hydration helpers", () => {
@@ -144,5 +188,19 @@ describe("hydration helpers", () => {
     delete (window as typeof window & Record<string, Flag[]>)[
       DEFAULT_FLAGS_GLOBAL
     ];
+  });
+
+  it("returns undefined when called in a server-like environment", () => {
+    vi.stubGlobal("window", undefined);
+    expect(readHydratedFlags()).toBeUndefined();
+    vi.unstubAllGlobals();
+  });
+});
+
+describe("useFlagsContext", () => {
+  it("throws when used without a provider", () => {
+    expect(() => renderHook(() => useFlagsContext())).toThrow(
+      "FlagsProvider is missing in the component tree.",
+    );
   });
 });

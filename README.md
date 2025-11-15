@@ -1,4 +1,4 @@
-# @basestack/flags-react
+# Basestack Feature Flags React Integration
 
 React bindings for the [Basestack Flags JS SDK](https://github.com/basestack-co/basestack-flags-js). This package exposes a provider, hooks, hydration helpers, and SSR utilities that work across Vite, Next.js (App or Pages Router), and TanStack Start.
 
