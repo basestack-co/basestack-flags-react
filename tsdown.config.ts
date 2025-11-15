@@ -6,6 +6,8 @@ export default defineConfig({
   minify: true,
   sourcemap: false,
   clean: true,
+  treeshake: true,
+  dts: true,
   platform: "neutral",
   target: "es2022",
   external: ["react", "react-dom", "@basestack/flags-js"],
