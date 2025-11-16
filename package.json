@@ -38,14 +38,6 @@
     "test:watch": "bunx vitest watch",
     "prepublishOnly": "bun run lint && bun run test && bun run build"
   },
-  "keywords": [
-    "feature-flags",
-    "react",
-    "basestack",
-    "sdk",
-    "nextjs",
-    "tanstack"
-  ],
   "author": "Basestack",
   "license": "MIT",
   "packageManager": "bun@1.3.2",
@@ -84,5 +76,33 @@
     ">0.35%",
     "not IE 11",
     "maintained node versions"
+  ],
+  "keywords": [
+    "feature-flags",
+    "feature-flag",
+    "feature-toggle",
+    "feature-toggles",
+    "feature-management",
+    "feature-rollout",
+    "feature-gating",
+    "react",
+    "react-hooks",
+    "react-sdk",
+    "sdk",
+    "javascript",
+    "typescript",
+    "frontend",
+    "nextjs",
+    "next-js",
+    "tanstack",
+    "zustand",
+    "redux",
+    "feature-flags-react",
+    "remote-config",
+    "config-management",
+    "a-b-testing",
+    "experimentation",
+    "flags",
+    "feature"
   ]
 }
