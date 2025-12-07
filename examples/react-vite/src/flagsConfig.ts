@@ -1,7 +1,7 @@
 import type { SDKConfig } from "@basestack/flags-js";
 
 export const flagsConfig: SDKConfig = {
-  baseURL: "http://localhost:4000/v1",
-  projectKey: "cmhj9vgjl000svj8oed92qi9u",
-  environmentKey: "cmhj9vgjo000uvj8ogf2m2fug",
+  baseURL: "https://flags-api.basestack.co/v1",
+  projectKey: "cmi66kums00020mpq5rw7ezx9",
+  environmentKey: "cmi66kumz00040mpqps87kxn8",
 };

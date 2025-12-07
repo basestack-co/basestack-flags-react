@@ -8,7 +8,7 @@ This folder contains minimal projects that mirror the integration patterns in th
 2. Pick one of the example folders below, `cd` into it, and install dependencies with `bun install`.
 3. Provide the `BASESTACK_*` env vars (or keep the default demo keys) and run the local dev command listed for that example.
 
-> All projects pin `packageManager` to `bun@1.3.2`. Feel free to use `bun run dev`, `bun run build`, etc.
+> All projects pin `packageManager` to `bun@1.3.4`. Feel free to use `bun run dev`, `bun run build`, etc.
 
 ### Included projects
 
