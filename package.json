@@ -56,10 +56,10 @@
   "devDependencies": {
     "@biomejs/biome": "^2.3.10",
     "@testing-library/react": "^16.3.1",
-    "jsdom": "^27.3.0",
+    "jsdom": "^27.4.0",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "tsdown": "^0.17.4",
+    "tsdown": "^0.18.3",
     "typescript": "^5.8.3",
     "vitest": "^4.0.16",
     "react": "^19.2.3",
