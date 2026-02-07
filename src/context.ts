@@ -10,6 +10,9 @@ interface FlagsContextValue {
   error: Error | null;
   refresh: () => Promise<void>;
   upsertFlag: (flag: Flag) => void;
+  projectKey: string;
+  environmentKey: string;
+  baseURL: string;
 }
 
 export const FlagsContext = createContext<FlagsContextValue | null>(null);

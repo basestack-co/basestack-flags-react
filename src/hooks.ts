@@ -3,6 +3,9 @@
 import type { Flag } from "@basestack/flags-js";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useFlagsContext } from "./context";
+import { getPreviewState } from "./preview-state";
+import type { OpenFeedbackModalOptions } from "./wc-modals";
+import { useFeatureFlagModalsOptional } from "./wc-modals";
 
 export interface UseFlagOptions<TPayload = unknown> {
   readonly defaultEnabled?: boolean;
@@ -17,6 +20,8 @@ export interface UseFlagResult<TPayload = unknown> {
   readonly isLoading: boolean;
   readonly error: Error | null;
   readonly refresh: () => Promise<Flag | undefined>;
+  /** Opens the feedback modal for this flag when FeatureFlagModalsProvider is present; no-op otherwise. */
+  readonly openFeedbackModal: (options?: OpenFeedbackModalOptions) => void;
 }
 
 export const useFlag = <TPayload = unknown>(
@@ -34,6 +39,7 @@ export const useFlag = <TPayload = unknown>(
     client,
     upsertFlag,
   } = useFlagsContext();
+  const modals = useFeatureFlagModalsOptional();
   const [localLoading, setLocalLoading] = useState(false);
   const [localError, setLocalError] = useState<Error | null>(null);
   const requestedRef = useRef(false);
@@ -77,10 +83,19 @@ export const useFlag = <TPayload = unknown>(
     }
   }, [cachedFlag, options?.fetch, providerLoading, refresh]);
 
-  const enabled = cachedFlag?.enabled ?? options?.defaultEnabled ?? false;
+  const previewEnabled = getPreviewState()[slug] === true;
+  const enabled =
+    previewEnabled || (cachedFlag?.enabled ?? options?.defaultEnabled ?? false);
   const payload = (cachedFlag?.payload ?? options?.defaultPayload) as
     | TPayload
     | undefined;
+
+  const openFeedbackModal = useCallback(
+    (options?: OpenFeedbackModalOptions) => {
+      modals?.openFeedbackModal(slug, options);
+    },
+    [modals, slug],
+  );
 
   return {
     flag: cachedFlag,
@@ -90,6 +105,7 @@ export const useFlag = <TPayload = unknown>(
       providerLoading || localLoading || (!cachedFlag && !requestedRef.current),
     error: localError ?? providerError,
     refresh,
+    openFeedbackModal,
   };
 };
 

@@ -6,6 +6,7 @@
       "name": "example-next-app-router",
       "dependencies": {
         "@basestack/flags-js": "^1.0.8",
+        "@basestack/flags-wc": "^0.0.1",
         "next": "16.1.6",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
@@ -18,6 +19,8 @@
   },
   "packages": {
     "@basestack/flags-js": ["@basestack/flags-js@1.0.8", "", {}, "sha512-V/K+uGQPxCSNAvaIXTA066qar7YGJn3ctEqLg7B8ueN9Tm6YyDv5Rv6CX7GKMIqo0CohuHiHgSVQRbZbtmrN5Q=="],
+
+    "@basestack/flags-wc": ["@basestack/flags-wc@0.0.1", "", {}, "sha512-8tJAlfgZyzycqF7/frluIyOPbNND2VNq7RdVf7gyOgnCsPaJJklxEwH8J/ZcBksfOohfMCRXQ3e2k71Z7RB7lA=="],
 
     "@emnapi/runtime": ["@emnapi/runtime@1.7.1", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-PVtJr5CmLwYAU9PZDMITZoR5iAOShYREoR45EyyLrbntV50mdePTgUn4AmOw90Ifcj+x2kRjdzr1HP3RrNiHGA=="],
 

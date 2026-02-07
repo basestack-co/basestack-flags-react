@@ -2,8 +2,12 @@
 
 import type { ReactNode } from "react";
 import type { Flag } from "@basestack/flags-js";
-import { FlagsProvider } from "../../../dist/client";
+import {
+  FeatureFlagModalsProvider,
+  FlagsProvider,
+} from "../../../dist/client";
 import { flagsConfig } from "./flags-config";
+import { flagsWcConfig } from "./flags-wc-config";
 
 export interface ProvidersProps {
   readonly children: ReactNode;
@@ -17,7 +21,12 @@ export function Providers({ children, initialFlags }: ProvidersProps) {
       initialFlags={initialFlags}
       preload={!initialFlags?.length}
     >
-      {children}
+      <FeatureFlagModalsProvider
+        config={flagsWcConfig}
+        onError={(err) => console.error("[FeatureFlagModals]", err)}
+      >
+        {children}
+      </FeatureFlagModalsProvider>
     </FlagsProvider>
   );
 }

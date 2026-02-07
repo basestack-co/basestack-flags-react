@@ -194,8 +194,21 @@ export function FlagsProvider({
       error,
       refresh,
       upsertFlag,
+      projectKey: config.projectKey,
+      environmentKey: config.environmentKey,
+      baseURL: config.baseURL,
     }),
-    [client, error, flags, loading, refresh, upsertFlag],
+    [
+      client,
+      config.baseURL,
+      config.environmentKey,
+      config.projectKey,
+      error,
+      flags,
+      loading,
+      refresh,
+      upsertFlag,
+    ],
   );
 
   return (

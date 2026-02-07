@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  BS_FLAGS_PREVIEW_STATE_KEY,
   DEFAULT_FLAGS_GLOBAL,
   FlagsProvider,
   readHydratedFlags,
@@ -144,6 +145,21 @@ describe("FlagsProvider + hooks", () => {
     expect(result.current.enabled).toBe(true);
     expect(result.current.payload).toEqual({ variant: "fallback" });
     expect(result.current.isLoading).toBe(true);
+  });
+
+  it("returns enabled true when flag is in preview state (localStorage)", () => {
+    window.localStorage.setItem(
+      BS_FLAGS_PREVIEW_STATE_KEY,
+      JSON.stringify({ secondary: true }),
+    );
+    const wrapper = createWrapper({
+      initialFlags: [createFlag({ slug: "secondary", enabled: false })],
+    });
+    const { result } = renderHook(() => useFlag("secondary"), { wrapper });
+
+    expect(result.current.enabled).toBe(true);
+
+    window.localStorage.removeItem(BS_FLAGS_PREVIEW_STATE_KEY);
   });
 
   it("exposes the underlying client via useFlagsClient", () => {
