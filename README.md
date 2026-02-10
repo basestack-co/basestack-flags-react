@@ -26,7 +26,7 @@ yarn add @basestack/flags-react
 
 React 18+ is required and should already exist in your project. The package ships as pure ESM and targets modern browsers/runtime APIs.
 
-You can import `SDKConfig`, `Flag`, and `FlagsSDK` directly from this package (`@basestack/flags-react`, `@basestack/flags-react/client`, or `@basestack/flags-react/server`) without adding a direct dependency on `@basestack/flags-js`.
+You can import `SDKConfig`, `Flag`, `CacheConfig`, and `FlagsSDK` directly from this package (`@basestack/flags-react`, `@basestack/flags-react/client`, or `@basestack/flags-react/server`) without adding a direct dependency on `@basestack/flags-js`.
 
 ## Local development
 
