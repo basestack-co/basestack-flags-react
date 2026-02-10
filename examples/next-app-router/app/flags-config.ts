@@ -1,4 +1,4 @@
-import type { SDKConfig } from "@basestack/flags-js";
+import type { SDKConfig } from "../../../dist/index";
 
 export const flagsConfig: SDKConfig = {
   baseURL: "http://localhost:4000/v1",

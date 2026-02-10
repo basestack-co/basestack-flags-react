@@ -44,6 +44,7 @@ export const useFlag = <TPayload = unknown>(
   const [localError, setLocalError] = useState<Error | null>(null);
   const requestedRef = useRef(false);
   const slugRef = useRef(slug);
+  const shouldFetch = options?.fetch !== false;
 
   if (slugRef.current !== slug) {
     slugRef.current = slug;
@@ -72,7 +73,7 @@ export const useFlag = <TPayload = unknown>(
   useEffect(() => {
     if (
       !cachedFlag &&
-      options?.fetch !== false &&
+      shouldFetch &&
       !providerLoading &&
       !requestedRef.current
     ) {
@@ -81,7 +82,7 @@ export const useFlag = <TPayload = unknown>(
     } else if (cachedFlag) {
       requestedRef.current = true;
     }
-  }, [cachedFlag, options?.fetch, providerLoading, refresh]);
+  }, [cachedFlag, providerLoading, refresh, shouldFetch]);
 
   const previewEnabled = getPreviewState()[slug] === true;
   const enabled =
@@ -102,7 +103,9 @@ export const useFlag = <TPayload = unknown>(
     enabled,
     payload,
     isLoading:
-      providerLoading || localLoading || (!cachedFlag && !requestedRef.current),
+      providerLoading ||
+      localLoading ||
+      (!cachedFlag && shouldFetch && !requestedRef.current),
     error: localError ?? providerError,
     refresh,
     openFeedbackModal,

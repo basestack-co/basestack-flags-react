@@ -10,7 +10,7 @@ export const flagsWcConfig: FeatureFlagModalsConfig = {
     selectionPlaceholder:
       "Select a feature on the left to see more details.",
     enableLabel: "Enable",
-    enabledLabel: "Enabled",
+    enabledLabel: "Disable",
     loadingLabel: "Loading feature previews…",
     emptyLabel: "No feature previews are currently available.",
     previewBadgeLabel: "Preview",

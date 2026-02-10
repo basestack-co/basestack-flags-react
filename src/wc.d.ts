@@ -10,15 +10,15 @@ export interface FeatureFlagFeedbackModalElement extends HTMLElement {
   featureName?: string;
 }
 
-declare global {
+declare module "react" {
   namespace JSX {
     interface IntrinsicElements {
-      "feature-flag-preview-modal": RefAttributes<FeatureFlagPreviewModalElement> &
-        Partial<{
+      "feature-flag-preview-modal": RefAttributes<FeatureFlagPreviewModalElement> & {
+        "api-endpoint": string;
+        "project-key": string;
+        "environment-key": string;
+      } & Partial<{
           theme: string;
-          "api-endpoint": string;
-          "project-key": string;
-          "environment-key": string;
           heading: string;
           subtitle: string;
           "selection-prompt": string;
@@ -31,12 +31,13 @@ declare global {
           "expires-soon-label": string;
           "learn-more-label": string;
         }>;
-      "feature-flag-feedback-modal": RefAttributes<FeatureFlagFeedbackModalElement> &
-        Partial<{
+
+      "feature-flag-feedback-modal": RefAttributes<FeatureFlagFeedbackModalElement> & {
+        "api-endpoint": string;
+        "project-key": string;
+        "environment-key": string;
+      } & Partial<{
           theme: string;
-          "api-endpoint": string;
-          "project-key": string;
-          "environment-key": string;
           "flag-key": string;
           "feature-name": string;
           heading: string;

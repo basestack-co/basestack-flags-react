@@ -6,7 +6,7 @@
       "name": "@basestack/flags-react",
       "dependencies": {
         "@basestack/flags-js": "^1.0.8",
-        "@basestack/flags-wc": "^0.0.4",
+        "@basestack/flags-wc": "^0.0.6",
       },
       "devDependencies": {
         "@biomejs/biome": "^2.3.14",
@@ -54,7 +54,7 @@
 
     "@basestack/flags-js": ["@basestack/flags-js@1.0.8", "", {}, "sha512-V/K+uGQPxCSNAvaIXTA066qar7YGJn3ctEqLg7B8ueN9Tm6YyDv5Rv6CX7GKMIqo0CohuHiHgSVQRbZbtmrN5Q=="],
 
-    "@basestack/flags-wc": ["@basestack/flags-wc@0.0.4", "", { "dependencies": { "@stencil/core": "^4.42.1" } }, "sha512-ES/ArFmxzeSpiYh42wcHebmuDnruNKmwvpr8CcbzcKTpUBEPczml3aXc1RrEeUYGUJpsFXzxs36XjqpmSPDQfw=="],
+    "@basestack/flags-wc": ["@basestack/flags-wc@0.0.6", "", { "dependencies": { "@stencil/core": "^4.42.1" } }, "sha512-pH2Ta9zHQXDT6vHZrP16kgQZBcXr3rwy9QTFCE5EViRZQS4mqUxVtSssWnHU9t2nDaWypOJL+XGOk1JJL0R95w=="],
 
     "@biomejs/biome": ["@biomejs/biome@2.3.14", "", { "optionalDependencies": { "@biomejs/cli-darwin-arm64": "2.3.14", "@biomejs/cli-darwin-x64": "2.3.14", "@biomejs/cli-linux-arm64": "2.3.14", "@biomejs/cli-linux-arm64-musl": "2.3.14", "@biomejs/cli-linux-x64": "2.3.14", "@biomejs/cli-linux-x64-musl": "2.3.14", "@biomejs/cli-win32-arm64": "2.3.14", "@biomejs/cli-win32-x64": "2.3.14" }, "bin": { "biome": "bin/biome" } }, "sha512-QMT6QviX0WqXJCaiqVMiBUCr5WRQ1iFSjvOLoTk6auKukJMvnMzWucXpwZB0e8F00/1/BsS9DzcKgWH+CLqVuA=="],
 

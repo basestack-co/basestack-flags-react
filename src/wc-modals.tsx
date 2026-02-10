@@ -7,6 +7,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -158,12 +159,15 @@ export function FeatureFlagModalsProvider({
     [],
   );
 
-  const value: FeatureFlagModalsContextValue = {
-    ready,
-    error,
-    openPreviewModal,
-    openFeedbackModal,
-  };
+  const value = useMemo<FeatureFlagModalsContextValue>(
+    () => ({
+      ready,
+      error,
+      openPreviewModal,
+      openFeedbackModal,
+    }),
+    [error, openFeedbackModal, openPreviewModal, ready],
+  );
 
   const { preview, feedback } = config;
   const theme = preview.theme ?? "light";

@@ -76,7 +76,7 @@ export function FlagsProvider({
   }, []);
 
   useEffect(() => {
-    if (!initialFlags || initialFlags.length === 0) return;
+    if (!initialFlags) return;
     safeSetFlags(() => mapFromFlags(initialFlags));
   }, [initialFlags, safeSetFlags]);
 
@@ -124,8 +124,10 @@ export function FlagsProvider({
 
   const fetchAllOrPreload = useCallback(async () => {
     if (config.preloadFlags && config.preloadFlags.length > 0) {
+      const uniqueSlugs = [...new Set(config.preloadFlags.filter(Boolean))];
+      if (uniqueSlugs.length === 0) return;
       const fetched = await Promise.all(
-        config.preloadFlags.map((slug) => client.getFlag(slug)),
+        uniqueSlugs.map((slug) => client.getFlag(slug)),
       );
       upsertFlags(fetched);
       return;
@@ -163,8 +165,7 @@ export function FlagsProvider({
       try {
         await fetchAllOrPreload();
       } catch (err) {
-        const resolved = normalizeError(err);
-        if (cancelled) throw resolved;
+        normalizeError(err);
       } finally {
         if (!cancelled) {
           safeSetLoading(false);
@@ -196,7 +197,7 @@ export function FlagsProvider({
       upsertFlag,
       projectKey: config.projectKey,
       environmentKey: config.environmentKey,
-      baseURL: config.baseURL,
+      baseURL: config.baseURL ?? "https://flags-api.basestack.co/v1",
     }),
     [
       client,
