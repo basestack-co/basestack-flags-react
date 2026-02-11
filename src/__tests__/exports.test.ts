@@ -1,14 +1,20 @@
 import { describe, expectTypeOf, it } from "vitest";
-import type { CacheConfig as ClientCacheConfig } from "../client";
-import type { Flag as ClientFlag } from "../client";
-import type { SDKConfig as ClientSDKConfig } from "../client";
-import type { CacheConfig as RootCacheConfig } from "../index";
-import type { Flag as RootFlag } from "../index";
-import type { SDKConfig as RootSDKConfig } from "../index";
+import type {
+  CacheConfig as ClientCacheConfig,
+  Flag as ClientFlag,
+  SDKConfig as ClientSDKConfig,
+} from "../client";
+import type {
+  CacheConfig as RootCacheConfig,
+  Flag as RootFlag,
+  SDKConfig as RootSDKConfig,
+} from "../index";
 import type { FlagsProviderProps } from "../provider";
-import type { CacheConfig as ServerCacheConfig } from "../server";
-import type { Flag as ServerFlag } from "../server";
-import type { SDKConfig as ServerSDKConfig } from "../server";
+import type {
+  CacheConfig as ServerCacheConfig,
+  Flag as ServerFlag,
+  SDKConfig as ServerSDKConfig,
+} from "../server";
 
 describe("public exports", () => {
   it("re-exports SDKConfig from root, client, and server entry points", () => {
