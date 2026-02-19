@@ -31,7 +31,16 @@ export default function HomePage() {
       {enabled ? (
         <button
           type="button"
-          onClick={() => openHeaderFeedbackModal({ featureName: "Header" })}
+          onClick={() =>
+            openHeaderFeedbackModal({
+              featureName: "Header",
+              metadata: {
+                userId: "usr_001",
+                subscription: "pro",
+                source: "header-banner",
+              },
+            })
+          }
           disabled={!ready}
           style={{
             marginTop: "0.5rem",
@@ -67,6 +76,12 @@ export default function HomePage() {
             onClick={() =>
               openFeedbackModal("command-palette", {
                 featureName: "Command Palette",
+                metadata: {
+                  userId: "usr_0012",
+                  subscription: "lite",
+                  openedFrom: "home-page-command-palette",
+                  context: { locale: "en-US" },
+                },
               })
             }
             disabled={!ready}

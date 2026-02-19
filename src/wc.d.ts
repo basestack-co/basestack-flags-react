@@ -8,6 +8,7 @@ export interface FeatureFlagFeedbackModalElement extends HTMLElement {
   open: boolean;
   flagKey: string;
   featureName?: string;
+  metadata?: Record<string, unknown>;
 }
 
 declare module "react" {
@@ -40,6 +41,7 @@ declare module "react" {
           theme: string;
           "flag-key": string;
           "feature-name": string;
+          metadata: Record<string, unknown>;
           heading: string;
           "mood-prompt": string;
           "rating-prompt": string;

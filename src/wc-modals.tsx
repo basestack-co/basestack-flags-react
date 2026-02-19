@@ -64,6 +64,7 @@ export interface FeatureFlagModalsConfig {
 
 export interface OpenFeedbackModalOptions {
   featureName?: string;
+  metadata?: Record<string, unknown>;
 }
 
 interface FeatureFlagModalsContextValue {
@@ -154,6 +155,7 @@ export function FeatureFlagModalsProvider({
       } else {
         el.removeAttribute("feature-name");
       }
+      el.metadata = options?.metadata;
       el.open = true;
     },
     [],
