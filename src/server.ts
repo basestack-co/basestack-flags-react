@@ -19,20 +19,44 @@ export const fetchFlag = async (
 export const fetchFlags = async (
   config: SDKConfig,
   slugs?: string[],
+  options?: {
+    fallback?: Flag[];
+    onError?: (error: unknown) => void;
+  },
 ): Promise<Flag[]> => {
   const client = createServerFlagsClient(config);
+  const fallback = options?.fallback || [];
 
-  if (slugs && slugs.length > 0) {
-    return Promise.all(slugs.map((slug) => client.getFlag(slug)));
+  try {
+    if (slugs && slugs.length > 0) {
+      const results = await Promise.allSettled(
+        slugs.map((slug) => client.getFlag(slug)),
+      );
+
+      const flags = results
+        .filter(
+          (r): r is PromiseFulfilledResult<Flag> => r.status === "fulfilled",
+        )
+        .map((r) => r.value);
+
+      if (flags.length !== slugs.length) {
+        options?.onError?.(new Error("Some flags could not be fetched."));
+
+        return fallback;
+      }
+
+      return flags;
+    }
+
+    const { flags } = await client.getAllFlags();
+
+    return flags;
+  } catch (error) {
+    options?.onError?.(error);
+    return fallback;
   }
-
-  const { flags } = await client.getAllFlags();
-  return flags;
 };
 
 export type { CacheConfig, Flag, SDKConfig } from "@basestack/flags-js";
 export { FlagsSDK } from "@basestack/flags-js";
-export {
-  DEFAULT_FLAGS_GLOBAL,
-  FlagsHydrationScript,
-} from "./hydration";
+export { DEFAULT_FLAGS_GLOBAL, FlagsHydrationScript } from "./hydration";

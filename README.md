@@ -13,18 +13,20 @@ React bindings for the [Basestack Flags JS SDK](https://github.com/basestack-co/
 ## Installation
 
 ```bash
-bun install @basestack/flags-react @basestack/flags-js
+bun install @basestack/flags-react
 ```
 
 ```bash
-npm install @basestack/flags-react @basestack/flags-js
+npm install @basestack/flags-react
 ```
 
 ```bash
-yarn add @basestack/flags-react @basestack/flags-js
+yarn add @basestack/flags-react
 ```
 
 React 18+ is required and should already exist in your project. The package ships as pure ESM and targets modern browsers/runtime APIs.
+
+You can import `SDKConfig`, `Flag`, `CacheConfig`, and `FlagsSDK` directly from this package (`@basestack/flags-react`, `@basestack/flags-react/client`, or `@basestack/flags-react/server`) without adding a direct dependency on `@basestack/flags-js`.
 
 ## Local development
 

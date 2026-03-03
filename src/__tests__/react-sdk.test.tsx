@@ -1,9 +1,10 @@
 import type { Flag, SDKConfig } from "@basestack/flags-js";
-import { act, renderHook } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  BS_FLAGS_PREVIEW_STATE_KEY,
   DEFAULT_FLAGS_GLOBAL,
   FlagsProvider,
   readHydratedFlags,
@@ -16,6 +17,7 @@ import { FlagsHydrationScript } from "../server";
 
 const flagsStore: Record<string, Flag> = {};
 let failGetAllFlags = false;
+let requestedFlagSlugs: string[] = [];
 
 const setMockFlags = (flags: Flag[]) => {
   Object.keys(flagsStore).forEach((slug) => {
@@ -37,6 +39,7 @@ vi.mock("@basestack/flags-js", async (importOriginal) => {
     }
 
     async getFlag(slug: string): Promise<Flag> {
+      requestedFlagSlugs.push(slug);
       const flag = flagsStore[slug];
       if (!flag) {
         throw new Error(`Flag ${slug} was not found`);
@@ -91,6 +94,7 @@ const createWrapper = (
 
 describe("FlagsProvider + hooks", () => {
   beforeEach(() => {
+    requestedFlagSlugs = [];
     setMockFlags([
       createFlag(),
       createFlag({ slug: "secondary", enabled: false }),
@@ -143,7 +147,43 @@ describe("FlagsProvider + hooks", () => {
 
     expect(result.current.enabled).toBe(true);
     expect(result.current.payload).toEqual({ variant: "fallback" });
-    expect(result.current.isLoading).toBe(true);
+    expect(result.current.isLoading).toBe(false);
+  });
+
+  it("deduplicates preload slugs before requesting flags", async () => {
+    const wrapper = createWrapper({
+      config: {
+        ...config,
+        preloadFlags: ["beta", "beta", "secondary", ""],
+      },
+      preload: true,
+    });
+    renderHook(() => useFlags(), { wrapper });
+
+    await waitFor(() => {
+      expect(requestedFlagSlugs).toHaveLength(2);
+    });
+
+    const requestedSlugs = requestedFlagSlugs.sort((a, b) =>
+      a.localeCompare(b),
+    );
+
+    expect(requestedSlugs).toEqual(["beta", "secondary"]);
+  });
+
+  it("returns enabled true when flag is in preview state (localStorage)", () => {
+    window.localStorage.setItem(
+      BS_FLAGS_PREVIEW_STATE_KEY,
+      JSON.stringify({ secondary: true }),
+    );
+    const wrapper = createWrapper({
+      initialFlags: [createFlag({ slug: "secondary", enabled: false })],
+    });
+    const { result } = renderHook(() => useFlag("secondary"), { wrapper });
+
+    expect(result.current.enabled).toBe(true);
+
+    window.localStorage.removeItem(BS_FLAGS_PREVIEW_STATE_KEY);
   });
 
   it("exposes the underlying client via useFlagsClient", () => {
