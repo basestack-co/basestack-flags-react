@@ -202,8 +202,8 @@ export function FeatureFlagModalsProvider({
             flag-key=""
             theme={feedback.theme ?? theme}
             api-endpoint={resolvedFeedbackEndpoint}
-            project-key={feedback.projectKey ?? resolvedProjectKey}
-            environment-key={feedback.environmentKey ?? resolvedEnvironmentKey}
+            project-key={feedback.projectKey ?? projectKey}
+            environment-key={feedback.environmentKey ?? environmentKey}
             heading={feedback.heading}
             mood-prompt={feedback.moodPrompt}
             rating-prompt={feedback.ratingPrompt}

@@ -25,7 +25,7 @@ export const fetchFlags = async (
   },
 ): Promise<Flag[]> => {
   const client = createServerFlagsClient(config);
-  const fallback = options?.fallback ?? [];
+  const fallback = options?.fallback || [];
 
   try {
     if (slugs && slugs.length > 0) {

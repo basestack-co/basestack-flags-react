@@ -8,7 +8,7 @@ export default function HomePage() {
     payload,
     isLoading,
     openFeedbackModal: openHeaderFeedbackModal,
-  } = useFlag<{ variant?: string }>("header");
+  } = useFlag<{ variant?: string }>("initiative_overview");
   const {
     ready,
     error: modalsError,
@@ -33,11 +33,11 @@ export default function HomePage() {
           type="button"
           onClick={() =>
             openHeaderFeedbackModal({
-              featureName: "Header",
+              featureName: "Initiative Overview",
               metadata: {
                 userId: "usr_001",
                 subscription: "pro",
-                source: "header-banner",
+                source: "initiative-overview",
               },
             })
           }
@@ -74,13 +74,12 @@ export default function HomePage() {
           <button
             type="button"
             onClick={() =>
-              openFeedbackModal("command-palette", {
-                featureName: "Command Palette",
+              openFeedbackModal("initiative_overview", {
+                featureName: "Initiative Overview",
                 metadata: {
-                  userId: "usr_0012",
-                  subscription: "lite",
-                  openedFrom: "home-page-command-palette",
-                  context: { locale: "en-US" },
+                  userId: "usr_001",
+                  subscription: "pro",
+                  source: "initiative-overview",
                 },
               })
             }
@@ -91,7 +90,7 @@ export default function HomePage() {
               maxWidth: "20rem",
             }}
           >
-            Leave feedback for “command-palette”
+            Leave feedback for “initiative overview”
           </button>
         </div>
       </section>
