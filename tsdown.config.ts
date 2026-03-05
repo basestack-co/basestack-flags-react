@@ -10,10 +10,12 @@ export default defineConfig({
   dts: true,
   platform: "neutral",
   target: "es2022",
-  external: [
-    "react",
-    "react-dom",
-    "@basestack/flags-js",
-    "@basestack/flags-wc",
-  ],
+  deps: {
+    neverBundle: [
+      "react",
+      "react-dom",
+      "@basestack/flags-js",
+      "@basestack/flags-wc",
+    ],
+  },
 });

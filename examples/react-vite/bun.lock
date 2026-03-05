@@ -5,7 +5,7 @@
     "": {
       "name": "example-react-vite",
       "dependencies": {
-        "@basestack/flags-js": "^1.0.8",
+        "@basestack/flags-js": "^1.1.0",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
       },
@@ -55,7 +55,7 @@
 
     "@babel/types": ["@babel/types@7.29.0", "", { "dependencies": { "@babel/helper-string-parser": "^7.27.1", "@babel/helper-validator-identifier": "^7.28.5" } }, "sha512-LwdZHpScM4Qz8Xw2iKSzS+cfglZzJGvofQICy7W7v4caru4EaAmyUuO6BGrbyQ2mYV11W0U8j5mBhd14dd3B0A=="],
 
-    "@basestack/flags-js": ["@basestack/flags-js@1.0.8", "", {}, "sha512-V/K+uGQPxCSNAvaIXTA066qar7YGJn3ctEqLg7B8ueN9Tm6YyDv5Rv6CX7GKMIqo0CohuHiHgSVQRbZbtmrN5Q=="],
+    "@basestack/flags-js": ["@basestack/flags-js@1.1.0", "", {}, "sha512-pQv+C/6J1fQm+u1PuNmYB01lfY2gOu7a+WFaUmOBn5lwRjRTb7mS6SM+5Q2cgZie+djP/2tNR9nLmssWIU+FBg=="],
 
     "@esbuild/aix-ppc64": ["@esbuild/aix-ppc64@0.27.2", "", { "os": "aix", "cpu": "ppc64" }, "sha512-GZMB+a0mOMZs4MpDbj8RJp4cw+w1WV5NYD6xzgvzUJ5Ek2jerwfO2eADyI6ExDSUED+1X8aMbegahsJi+8mgpw=="],
 
