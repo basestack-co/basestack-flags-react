@@ -5,7 +5,7 @@ React bindings for the [Basestack Flags JS SDK](https://github.com/basestack-co/
 ## Features
 
 - **Zero-config provider** powered by the official `@basestack/flags-js` client.
-- **Hooks for component-level reads** (`useFlag`, `useFlags`, `useFlagsClient`).
+- **Hooks and components for component-level reads** (`useFlag`, `useFlags`, `useFlagsClient`, `Feature`).
 - **Server utilities** to preload flags in frameworks with data loaders or RSC.
 - **Hydration helpers** for streaming initial flag snapshots safely to the client.
 - **Tree-shakeable ESM output** built with [`tsdown`](https://github.com/egoist/tsdown) and linted/formatted via [Biome](https://biomejs.dev/).
@@ -44,7 +44,7 @@ All examples rely on the compiled `dist/` output, so run `bun run build` before 
 ## Quick start (React + Vite)
 
 ```tsx
-import { FlagsProvider, useFlag } from "@basestack/flags-react/client";
+import { Feature, FlagsProvider, useFlag } from "@basestack/flags-react/client";
 
 const config = {
   projectKey: process.env.VITE_BASESTACK_PROJECT_KEY!,
@@ -69,6 +69,23 @@ function HomePage() {
     <NewHomepage variant={payload?.variant} />
   ) : (
     <LegacyHomepage />
+  );
+}
+```
+
+For simple render gating, the component API can be even smaller:
+
+```tsx
+import { Feature } from "@basestack/flags-react/client";
+
+function MarketingPage() {
+  return (
+    <Feature slug="marketing-callout">
+      <article className="card accent">
+        <h2>Component reference</h2>
+        <p>marketing-callout is wrapped in a Feature component.</p>
+      </article>
+    </Feature>
   );
 }
 ```
@@ -327,7 +344,7 @@ export function App() {
 Import these from `@basestack/flags-react/client`.
 
 - `useFlag(slug, options)`
-  - Returns `{ flag, enabled, payload, isLoading, error, refresh }`.
+  - Returns `{ flag, enabled, payload, isLoading, error, refresh, openFeedbackModal }`.
   - Automatically fetches the flag once per mount (unless `options.fetch === false`).
   - `options.defaultEnabled` and `options.defaultPayload` let you provide fallbacks while loading.
 - `useFlags()`
@@ -335,6 +352,57 @@ Import these from `@basestack/flags-react/client`.
   - Ideal for Admin/Settings UIs or debugging views.
 - `useFlagsClient()`
   - Provides direct access to the underlying `FlagsSDK` instance for advanced operations.
+
+## Component reference
+
+- `Feature`
+  - Default usage is `<Feature slug="flag-slug">{children}</Feature>`.
+  - Plain JSX children render only when the flag is enabled.
+  - `fallback` renders when the flag is disabled.
+  - `loading` renders while the flag is being resolved.
+  - `defaultEnabled`, `defaultPayload`, and `fetch` behave the same as `useFlag`.
+  - When `children`, `fallback`, or `loading` are functions, they receive the same object returned by `useFlag`.
+
+```tsx
+import { Feature } from "@basestack/flags-react/client";
+
+<Feature
+  slug="marketing-callout"
+  fallback={<LegacyCallout />}
+  loading={<p>Checking feature flag…</p>}
+>
+  <MarketingCallout />
+</Feature>;
+```
+
+Use the render-prop form when you need access to payload, errors, or actions such as `refresh()` and `openFeedbackModal()`:
+
+```tsx
+import { Feature } from "@basestack/flags-react/client";
+
+<Feature<{ variant?: string }>
+  slug="marketing-callout"
+  defaultPayload={{ variant: "control" }}
+>
+  {({ enabled, payload, isLoading, error, refresh, openFeedbackModal }) => {
+    if (isLoading) return <p>Checking feature flag…</p>;
+    if (error) return <button onClick={() => refresh()}>Retry</button>;
+    if (!enabled) return <LegacyCallout />;
+
+    return (
+      <section>
+        <MarketingCallout variant={payload?.variant} />
+        <button
+          type="button"
+          onClick={() => openFeedbackModal({ featureName: "Marketing callout" })}
+        >
+          Leave feedback
+        </button>
+      </section>
+    );
+  }}
+</Feature>;
+```
 
 ## Server utilities
 

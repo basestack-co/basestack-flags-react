@@ -1,11 +1,18 @@
 import type { Flag, SDKConfig } from "@basestack/flags-js";
-import { act, renderHook, waitFor } from "@testing-library/react";
+import {
+  act,
+  render,
+  renderHook,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import type { ReactNode } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   BS_FLAGS_PREVIEW_STATE_KEY,
   DEFAULT_FLAGS_GLOBAL,
+  Feature,
   FlagsProvider,
   readHydratedFlags,
   useFlag,
@@ -204,6 +211,111 @@ describe("FlagsProvider + hooks", () => {
       await expect(result.current.refresh()).rejects.toThrow("Forced failure");
     });
     expect(onError).toHaveBeenCalledWith(expect.any(Error));
+  });
+
+  it("renders children only when the feature is enabled", () => {
+    const wrapper = createWrapper({
+      initialFlags: [createFlag({ slug: "marketing-callout", enabled: true })],
+    });
+
+    render(
+      <Feature slug="marketing-callout">
+        <article>Component reference</article>
+      </Feature>,
+      { wrapper },
+    );
+
+    expect(screen.getByText("Component reference")).toBeTruthy();
+  });
+
+  it("renders fallback content when the feature is disabled", () => {
+    const wrapper = createWrapper({
+      initialFlags: [createFlag({ slug: "marketing-callout", enabled: false })],
+    });
+
+    render(
+      <Feature slug="marketing-callout" fallback={<p>Fallback experience</p>}>
+        <article>Component reference</article>
+      </Feature>,
+      { wrapper },
+    );
+
+    expect(screen.queryByText("Component reference")).toBeNull();
+    expect(screen.getByText("Fallback experience")).toBeTruthy();
+  });
+
+  it("renders loading content while the flag is being fetched", async () => {
+    const wrapper = createWrapper();
+
+    render(
+      <Feature slug="beta" loading={<p>Checking feature flag…</p>}>
+        <article>Loaded experience</article>
+      </Feature>,
+      { wrapper },
+    );
+
+    expect(screen.getByText("Checking feature flag…")).toBeTruthy();
+
+    await waitFor(() => {
+      expect(screen.getByText("Loaded experience")).toBeTruthy();
+    });
+  });
+
+  it("supports render props with the same state and actions as useFlag", () => {
+    const wrapper = createWrapper();
+
+    render(
+      <Feature<{ variant: string }>
+        slug="missing"
+        fetch={false}
+        defaultEnabled
+        defaultPayload={{ variant: "fallback" }}
+      >
+        {({
+          enabled,
+          payload,
+          isLoading,
+          error,
+          refresh,
+          openFeedbackModal,
+        }) => (
+          <p>
+            {[
+              String(enabled),
+              payload?.variant ?? "none",
+              String(isLoading),
+              error === null ? "no-error" : "has-error",
+              typeof refresh === "function" ? "refresh" : "no-refresh",
+              typeof openFeedbackModal === "function"
+                ? "feedback"
+                : "no-feedback",
+            ].join("|")}
+          </p>
+        )}
+      </Feature>,
+      { wrapper },
+    );
+
+    expect(
+      screen.getByText("true|fallback|false|no-error|refresh|feedback"),
+    ).toBeTruthy();
+  });
+
+  it("uses render props for full control even when the feature is disabled", () => {
+    const wrapper = createWrapper({
+      initialFlags: [createFlag({ slug: "secondary", enabled: false })],
+    });
+
+    render(
+      <Feature<{ variant: string }> slug="secondary">
+        {({ enabled, payload }) => (
+          <p>{`${enabled ? "enabled" : "disabled"}|${payload?.variant ?? "none"}`}</p>
+        )}
+      </Feature>,
+      { wrapper },
+    );
+
+    expect(screen.getByText("disabled|A")).toBeTruthy();
   });
 });
 

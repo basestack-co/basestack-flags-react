@@ -3,6 +3,7 @@ import type {
   CacheConfig as ClientCacheConfig,
   Flag as ClientFlag,
   SDKConfig as ClientSDKConfig,
+  FeatureProps,
 } from "../client";
 import type {
   CacheConfig as RootCacheConfig,
@@ -33,5 +34,9 @@ describe("public exports", () => {
   it("re-exports CacheConfig from root, client, and server entry points", () => {
     expectTypeOf<RootCacheConfig>().toEqualTypeOf<ClientCacheConfig>();
     expectTypeOf<ClientCacheConfig>().toEqualTypeOf<ServerCacheConfig>();
+  });
+
+  it("exports FeatureProps from the client entry point", () => {
+    expectTypeOf<FeatureProps>().toMatchTypeOf<{ slug: string }>();
   });
 });

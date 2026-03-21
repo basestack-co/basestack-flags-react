@@ -1,6 +1,6 @@
 "use client";
 
-import { useFlag, useFeatureFlagModals } from "../../../dist/client";
+import { useFlag, useFeatureFlagModals, Feature } from "../../../dist/client";
 
 export default function HomePage() {
   const {
@@ -93,6 +93,14 @@ export default function HomePage() {
             Leave feedback for “initiative overview”
           </button>
         </div>
+
+
+        <Feature slug="initiative_overview">
+          <article className="card accent">
+            <h2>Component reference</h2>
+            <p>initiative_overview is wrapped in a Feature component.</p>
+          </article>
+        </Feature>
       </section>
     </main>
   );
