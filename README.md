@@ -5,7 +5,7 @@ React bindings for the [Basestack Flags JS SDK](https://github.com/basestack-co/
 ## Features
 
 - **Zero-config provider** powered by the official `@basestack/flags-js` client.
-- **Hooks for component-level reads** (`useFlag`, `useFlags`, `useFlagsClient`).
+- **Hooks and components for component-level reads** (`useFlag`, `useFlags`, `useFlagsClient`, `Feature`).
 - **Server utilities** to preload flags in frameworks with data loaders or RSC.
 - **Hydration helpers** for streaming initial flag snapshots safely to the client.
 - **Tree-shakeable ESM output** built with [`tsdown`](https://github.com/egoist/tsdown) and linted/formatted via [Biome](https://biomejs.dev/).
@@ -24,7 +24,12 @@ npm install @basestack/flags-react
 yarn add @basestack/flags-react
 ```
 
-React 18+ is required and should already exist in your project. The package ships as pure ESM and targets modern browsers/runtime APIs.
+React 19.2.4+ is required. `react-dom` 18.2.0+ is recommended for browser apps and remains optional for server-only consumers. The package ships as pure ESM and targets modern browsers/runtime APIs.
+
+Runtime requirements:
+
+- Node.js 18.17+ for local tooling and server runtimes.
+- An ESM-compatible framework or bundler.
 
 You can import `SDKConfig`, `Flag`, `CacheConfig`, and `FlagsSDK` directly from this package (`@basestack/flags-react`, `@basestack/flags-react/client`, or `@basestack/flags-react/server`) without adding a direct dependency on `@basestack/flags-js`.
 
@@ -44,7 +49,7 @@ All examples rely on the compiled `dist/` output, so run `bun run build` before 
 ## Quick start (React + Vite)
 
 ```tsx
-import { FlagsProvider, useFlag } from "@basestack/flags-react/client";
+import { Feature, FlagsProvider, useFlag } from "@basestack/flags-react/client";
 
 const config = {
   projectKey: process.env.VITE_BASESTACK_PROJECT_KEY!,
@@ -73,6 +78,23 @@ function HomePage() {
 }
 ```
 
+For simple render gating, the component API can be even smaller:
+
+```tsx
+import { Feature } from "@basestack/flags-react/client";
+
+function MarketingPage() {
+  return (
+    <Feature slug="marketing-callout">
+      <article className="card accent">
+        <h2>Component reference</h2>
+        <p>marketing-callout is wrapped in a Feature component.</p>
+      </article>
+    </Feature>
+  );
+}
+```
+
 - The provider accepts the exact `SDKConfig` used by `@basestack/flags-js` plus optional props:
   - `initialFlags`: preload data, usually from SSR.
   - `preload` (default `true`): automatically fetch missing flags when `initialFlags` is empty.
@@ -84,7 +106,7 @@ function HomePage() {
 
 Use the subpath that matches your runtime to avoid loading client-only hooks on the server:
 
-- `@basestack/flags-react/client` &mdash; `FlagsProvider`, hooks, `readHydratedFlags`, and SDK types. The file itself includes the `"use client"` directive.
+- `@basestack/flags-react/client` &mdash; `FlagsProvider`, hooks, `Feature`, `readHydratedFlags`, preview helpers, modal helpers, and SDK types. The file itself includes the `"use client"` directive.
 - `@basestack/flags-react/server` &mdash; `fetchFlag`, `fetchFlags`, `createServerFlagsClient`, `FlagsHydrationScript`, and shared constants.
 - `@basestack/flags-react` &mdash; server-friendly exports (no hooks or provider). Prefer the explicit `/client` and `/server` paths for new integrations.
 
@@ -131,7 +153,7 @@ export default async function RootLayout({
 "use client";
 
 import { FlagsProvider } from "@basestack/flags-react/client";
-import type { Flag } from "@basestack/flags-js";
+import type { Flag } from "@basestack/flags-react";
 import type { ReactNode } from "react";
 import { flagsConfig } from "./flags-config";
 
@@ -168,7 +190,8 @@ The App Router example also includes:
 ```tsx
 // pages/_app.tsx
 import type { AppProps } from "next/app";
-import { FlagsProvider } from "@basestack/flags-react/client";
+import { FlagsProvider, type Flag } from "@basestack/flags-react/client";
+import type { Flag } from "@basestack/flags-react";
 
 const config = {
   projectKey: process.env.NEXT_PUBLIC_BASESTACK_PROJECT_KEY!,
@@ -193,12 +216,12 @@ export default function MyApp({
 }
 ```
 
-````tsx
+```tsx
 // pages/index.tsx
 import { fetchFlags } from "@basestack/flags-react/server";
 import { useFlag } from "@basestack/flags-react/client";
 import type { GetServerSideProps } from "next";
-import type { Flag } from "@basestack/flags-js";
+import type { Flag } from "@basestack/flags-react";
 
 export const getServerSideProps: GetServerSideProps<{ flags: Flag[] }> = async () => {
   const flags = await fetchFlags({
@@ -211,6 +234,14 @@ export const getServerSideProps: GetServerSideProps<{ flags: Flag[] }> = async (
     props: { flags },
   };
 };
+
+export default function HomePage() {
+  const { enabled, isLoading } = useFlag("header");
+
+  if (isLoading) return <p>Checking...</p>;
+  return enabled ? <NewHomepage /> : <LegacyHomepage />;
+}
+```
 
 ### API Route
 
@@ -230,9 +261,7 @@ export default async function handler(_req: NextApiRequest, res: NextApiResponse
     res.status(500).json({ message: "Unable to load flags" });
   }
 }
-````
-
-````
+```
 
 ## TanStack Start
 
@@ -327,14 +356,67 @@ export function App() {
 Import these from `@basestack/flags-react/client`.
 
 - `useFlag(slug, options)`
-  - Returns `{ flag, enabled, payload, isLoading, error, refresh }`.
+  - Returns `{ flag, enabled, payload, isLoading, error, refresh, openFeedbackModal }`.
   - Automatically fetches the flag once per mount (unless `options.fetch === false`).
   - `options.defaultEnabled` and `options.defaultPayload` let you provide fallbacks while loading.
+  - Preview state stored in localStorage can force `enabled === true` for a slug during client-side previews.
+  - `openFeedbackModal()` is a no-op unless `FeatureFlagModalsProvider` is mounted.
 - `useFlags()`
   - Returns `{ flags, flagsBySlug, isLoading, error, refresh }`.
   - Ideal for Admin/Settings UIs or debugging views.
 - `useFlagsClient()`
   - Provides direct access to the underlying `FlagsSDK` instance for advanced operations.
+
+## Component reference
+
+- `Feature`
+  - Default usage is `<Feature slug="flag-slug">{children}</Feature>`.
+  - Plain JSX children render only when the flag is enabled.
+  - `fallback` renders when the flag is disabled.
+  - `loading` renders while the flag is being resolved.
+  - `defaultEnabled`, `defaultPayload`, and `fetch` behave the same as `useFlag`.
+  - When `children`, `fallback`, or `loading` are functions, they receive the same object returned by `useFlag`.
+
+```tsx
+import { Feature } from "@basestack/flags-react/client";
+
+<Feature
+  slug="marketing-callout"
+  fallback={<LegacyCallout />}
+  loading={<p>Checking feature flag…</p>}
+>
+  <MarketingCallout />
+</Feature>;
+```
+
+Use the render-prop form when you need access to payload, errors, or actions such as `refresh()` and `openFeedbackModal()`:
+
+```tsx
+import { Feature } from "@basestack/flags-react/client";
+
+<Feature<{ variant?: string }>
+  slug="marketing-callout"
+  defaultPayload={{ variant: "control" }}
+>
+  {({ enabled, payload, isLoading, error, refresh, openFeedbackModal }) => {
+    if (isLoading) return <p>Checking feature flag…</p>;
+    if (error) return <button onClick={() => refresh()}>Retry</button>;
+    if (!enabled) return <LegacyCallout />;
+
+    return (
+      <section>
+        <MarketingCallout variant={payload?.variant} />
+        <button
+          type="button"
+          onClick={() => openFeedbackModal({ featureName: "Marketing callout" })}
+        >
+          Leave feedback
+        </button>
+      </section>
+    );
+  }}
+</Feature>;
+```
 
 ## Server utilities
 
@@ -348,9 +430,11 @@ import {
 } from "@basestack/flags-react/server";
 ```
 
-- `fetchFlags(config, slugs?)`: returns a `Flag[]`. When `slugs` is omitted, it loads the full project.
+- `fetchFlags(config, slugs?, { fallback, onError })`: returns a `Flag[]`. When `slugs` is omitted, it loads the full project.
 - `fetchFlag(slug, config)`: fetch exactly one flag.
 - `createServerFlagsClient(config)`: returns a configured `FlagsSDK` so you can call low-level methods inside loaders.
+
+When you pass `slugs`, `fetchFlags()` requires every slug fetch to succeed. If any request fails, it calls `onError` and returns `fallback` (or `[]` when no fallback is provided).
 
 ## Hydration helpers
 
@@ -367,6 +451,76 @@ const hydrated = readHydratedFlags();
 
 `FlagsHydrationScript` encodes the snapshot using `globalThis["__BASESTACK_FLAGS__"]`. Pass `globalKey` to customize the name or set a CSP `nonce` when needed. `readHydratedFlags` only works in the browser, so import it from `/client`.
 
+## Preview state
+
+The client entry point also exports:
+
+- `BS_FLAGS_PREVIEW_STATE_KEY`
+- `getPreviewState()`
+
+These are used by the web-component preview flow. If localStorage contains `bs-flags-preview-state`, `useFlag()` treats any slug marked `true` as enabled on the client, even if the fetched flag is disabled. This is useful for preview/testing flows and worth knowing when debugging unexpected enabled states.
+
+## Modal integration
+
+The client package includes optional helpers built on top of `@basestack/flags-wc`:
+
+- `FeatureFlagModalsProvider`
+- `useFeatureFlagModals()`
+- `useFeatureFlagModalsOptional()`
+- `OpenFeedbackModalOptions`
+- `FeatureFlagModalsConfig`
+
+Wrap your app with `FeatureFlagModalsProvider` inside `FlagsProvider` when you want preview and feedback modals:
+
+```tsx
+import {
+  FeatureFlagModalsProvider,
+  FlagsProvider,
+  useFeatureFlagModals,
+} from "@basestack/flags-react/client";
+
+const flagsConfig = {
+  projectKey: process.env.VITE_BASESTACK_PROJECT_KEY!,
+  environmentKey: process.env.VITE_BASESTACK_ENVIRONMENT_KEY!,
+};
+
+const modalConfig = {
+  preview: {},
+  feedback: {},
+};
+
+function AppShell() {
+  return (
+    <FlagsProvider config={flagsConfig}>
+      <FeatureFlagModalsProvider config={modalConfig}>
+        <App />
+      </FeatureFlagModalsProvider>
+    </FlagsProvider>
+  );
+}
+
+function PreviewButton() {
+  const { ready, error, openPreviewModal } = useFeatureFlagModals();
+
+  if (error) return <p>Preview UI unavailable.</p>;
+
+  return (
+    <button type="button" disabled={!ready} onClick={() => openPreviewModal()}>
+      Open flag preview
+    </button>
+  );
+}
+```
+
+Notes:
+
+- `FeatureFlagModalsProvider` must be rendered under `FlagsProvider`.
+- `ready` becomes `true` after the custom elements from `@basestack/flags-wc` are registered.
+- `onError` receives registration failures.
+- By default, the provider derives `projectKey`, `environmentKey`, and `baseURL` from `FlagsProvider`.
+- Default endpoints are `${baseURL}/flags/preview` for preview and `${baseURL}/flags/preview/feedback` for feedback.
+- `useFlag(...).openFeedbackModal(options)` forwards the current flag slug plus optional `featureName` and `metadata`.
+
 ## Scripts
 
 | Command          | Description                                  |
@@ -382,7 +536,7 @@ Use `bun run prepublishOnly` locally before releasing to ensure lint + tests sta
 ## Development notes
 
 - Source lives in `src/` and is compiled to `dist/` via `tsdown` (ESM only).
-- The package exposes only modern ESM/Node 20+ syntax; no CommonJS output is produced.
+- The package exposes only modern ESM syntax; no CommonJS output is produced.
 - Biome powers linting/formatting, so please keep editor integrations enabled.
 
 ## Examples
