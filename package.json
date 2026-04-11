@@ -1,6 +1,6 @@
 {
   "name": "@basestack/flags-react",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "React bindings for the Basestack Feature Flags SDK",
   "repository": "https://github.com/basestack-co/basestack-flags-react",
   "private": false,
@@ -42,11 +42,11 @@
   "license": "MIT",
   "packageManager": "bun@1.3.12",
   "dependencies": {
-    "@basestack/flags-js": "^1.1.0",
-    "@basestack/flags-wc": "^1.0.0"
+    "@basestack/flags-js": "^1.2.0",
+    "@basestack/flags-wc": "^1.0.1"
   },
   "peerDependencies": {
-    "react": ">=19.2.4",
+    "react": ">=19.2.5",
     "react-dom": ">=18.2.0"
   },
   "peerDependenciesMeta": {
@@ -55,16 +55,16 @@
     }
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.10",
+    "@biomejs/biome": "^2.4.11",
     "@testing-library/react": "^16.3.2",
     "jsdom": "^29.0.2",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "tsdown": "^0.21.7",
     "typescript": "^6.0.2",
-    "vitest": "^4.1.3",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "vitest": "^4.1.4",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5"
   },
   "publishConfig": {
     "access": "public"
