@@ -25,7 +25,7 @@ export const fetchFlags = async (
   },
 ): Promise<Flag[]> => {
   const client = createServerFlagsClient(config);
-  const fallback = options?.fallback || [];
+  const fallback = options?.fallback ?? [];
 
   try {
     if (slugs && slugs.length > 0) {
@@ -37,7 +37,8 @@ export const fetchFlags = async (
         .filter(
           (r): r is PromiseFulfilledResult<Flag> => r.status === "fulfilled",
         )
-        .map((r) => r.value);
+        .map((r) => r.value)
+        .filter(Boolean);
 
       if (flags.length !== slugs.length) {
         options?.onError?.(new Error("Some flags could not be fetched."));
@@ -48,7 +49,13 @@ export const fetchFlags = async (
       return flags;
     }
 
-    const { flags } = await client.getAllFlags();
+    const response = await client.getAllFlags();
+    const flags = response?.flags;
+
+    if (!Array.isArray(flags)) {
+      options?.onError?.(new Error("Flags response did not include a list."));
+      return fallback;
+    }
 
     return flags;
   } catch (error) {

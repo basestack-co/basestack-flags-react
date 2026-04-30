@@ -24,6 +24,7 @@ import { FlagsHydrationScript } from "../server";
 
 const flagsStore: Record<string, Flag> = {};
 let failGetAllFlags = false;
+let malformedGetAllFlags = false;
 let requestedFlagSlugs: string[] = [];
 
 const setMockFlags = (flags: Flag[]) => {
@@ -58,6 +59,9 @@ vi.mock("@basestack/flags-js", async (importOriginal) => {
     async getAllFlags(): Promise<{ flags: Flag[] }> {
       if (failGetAllFlags) {
         throw new Error("Forced failure");
+      }
+      if (malformedGetAllFlags) {
+        return { flags: undefined } as never;
       }
       return {
         flags: Object.values(flagsStore),
@@ -107,6 +111,7 @@ describe("FlagsProvider + hooks", () => {
       createFlag({ slug: "secondary", enabled: false }),
     ]);
     failGetAllFlags = false;
+    malformedGetAllFlags = false;
   });
 
   it("exposes initial flags immediately", () => {
@@ -211,6 +216,21 @@ describe("FlagsProvider + hooks", () => {
       await expect(result.current.refresh()).rejects.toThrow("Forced failure");
     });
     expect(onError).toHaveBeenCalledWith(expect.any(Error));
+  });
+
+  it("calls onError instead of crashing when preload receives malformed flags", async () => {
+    malformedGetAllFlags = true;
+    const onError = vi.fn();
+    const wrapper = createWrapper({ preload: true, onError });
+
+    const { result } = renderHook(() => useFlags(), { wrapper });
+
+    await waitFor(() => {
+      expect(onError).toHaveBeenCalledWith(expect.any(Error));
+    });
+
+    expect(result.current.flags).toEqual([]);
+    expect(result.current.isLoading).toBe(false);
   });
 
   it("renders children only when the feature is enabled", () => {
@@ -328,6 +348,12 @@ describe("hydration helpers", () => {
     expect(markup).toContain(DEFAULT_FLAGS_GLOBAL);
     expect(markup).toContain("\\u003Cscript");
     expect(markup).not.toContain("<script>"); // script text stays escaped inside JSON
+  });
+
+  it("renders an empty hydration script when flags are missing", () => {
+    const markup = renderToStaticMarkup(<FlagsHydrationScript />);
+
+    expect(markup).toContain(`"${DEFAULT_FLAGS_GLOBAL}"] = [];`);
   });
 
   it("reads hydrated flags from the window object", () => {

@@ -22,10 +22,10 @@ export interface FlagsProviderProps {
 
 const EMPTY_FLAGS: Flag[] = [];
 
-const mapFromFlags = (flags: Flag[]): Map<string, Flag> => {
+const mapFromFlags = (flags: Flag[] | null | undefined): Map<string, Flag> => {
   const next = new Map<string, Flag>();
 
-  for (const flag of flags) {
+  for (const flag of Array.isArray(flags) ? flags : EMPTY_FLAGS) {
     next.set(flag.slug, flag);
   }
 
@@ -133,7 +133,13 @@ export function FlagsProvider({
       return;
     }
 
-    const { flags: fetched } = await client.getAllFlags();
+    const response = await client.getAllFlags();
+    const fetched = response?.flags;
+
+    if (!Array.isArray(fetched)) {
+      throw new Error("Flags response did not include a list.");
+    }
+
     upsertFlags(fetched);
   }, [client, config.preloadFlags, upsertFlags]);
 

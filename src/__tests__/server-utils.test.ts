@@ -80,4 +80,34 @@ describe("server helpers", () => {
     expect(getAllFlags).toHaveBeenCalled();
     expect(flags).toEqual([sampleFlag]);
   });
+
+  it("fetchFlags returns the fallback when every-flag response is malformed", async () => {
+    const fallback = [sampleFlag];
+    const onError = vi.fn();
+    getAllFlags.mockResolvedValue({ flags: undefined } as never);
+
+    const flags = await fetchFlags(config, undefined, { fallback, onError });
+
+    expect(flags).toBe(fallback);
+    expect(onError).toHaveBeenCalledWith(expect.any(Error));
+  });
+
+  it("fetchFlags returns an empty fallback when every-flag fetch fails", async () => {
+    const onError = vi.fn();
+    getAllFlags.mockRejectedValue(new Error("API unavailable"));
+
+    const flags = await fetchFlags(config, undefined, { onError });
+
+    expect(flags).toEqual([]);
+    expect(onError).toHaveBeenCalledWith(expect.any(Error));
+  });
+
+  it("fetchFlags returns the fallback when a slug resolves without a flag", async () => {
+    const fallback = [sampleFlag];
+    getFlag.mockResolvedValueOnce(undefined as never);
+
+    const flags = await fetchFlags(config, ["missing"], { fallback });
+
+    expect(flags).toBe(fallback);
+  });
 });

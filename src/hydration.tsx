@@ -3,14 +3,14 @@ import type { Flag } from "@basestack/flags-js";
 export const DEFAULT_FLAGS_GLOBAL = "__BASESTACK_FLAGS__";
 
 export interface FlagsHydrationScriptProps {
-  readonly flags: Flag[];
+  readonly flags?: Flag[] | null;
   readonly id?: string;
   readonly nonce?: string;
   readonly globalKey?: string;
 }
 
-const encodeFlagsForScript = (flags: Flag[]) =>
-  JSON.stringify(flags).replace(/</g, "\\u003C");
+const encodeFlagsForScript = (flags?: Flag[] | null) =>
+  JSON.stringify(Array.isArray(flags) ? flags : []).replace(/</g, "\\u003C");
 
 export function FlagsHydrationScript({
   flags,
